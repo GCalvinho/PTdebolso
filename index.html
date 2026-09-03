@@ -54,7 +54,8 @@
     display:flex;align-items:center;justify-content:space-between;
     padding:18px 20px 10px;
   }
-  .brand{font-weight:800;font-size:17px;letter-spacing:-0.02em;}
+  .brand{font-weight:800;font-size:17px;letter-spacing:-0.02em;display:flex;align-items:center;gap:6px;}
+  .brand-logo{width:20px;height:auto;flex-shrink:0;}
   .brand span{color:var(--accent);}
   .iconbtn{
     width:38px;height:38px;border-radius:50%;
@@ -102,6 +103,10 @@
     border:1px solid var(--line);cursor:pointer;font-size:15px;
   }
   .toggle-opt.active{background:var(--accent);border-color:var(--accent);color:#1a0d08;font-weight:700;}
+  .rate-row{display:flex;align-items:center;gap:14px;text-align:left;padding:14px 16px;}
+  .rate-icon{width:44px;height:44px;flex-shrink:0;}
+  .rate-sub{font-size:12.5px;color:var(--muted);font-weight:400;margin-top:2px;}
+  .toggle-opt.rate-row.active .rate-sub{color:#3a1c10;}
 
   .progressdots{display:flex;gap:6px;margin-bottom:18px;}
   .progressdots span{height:4px;flex:1;border-radius:2px;background:var(--line);}
@@ -222,16 +227,53 @@
   .weekbar .wd{flex:1;height:5px;border-radius:3px;background:var(--line);}
   .weekbar .wd.done{background:var(--good);}
   .weekbar .wd.today{background:var(--accent);}
+
+  .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:5000;
+    display:flex;align-items:center;justify-content:center;padding:24px;}
+  .confirm-box{background:var(--surface);border-radius:18px;padding:22px;max-width:340px;width:100%;
+    border:1px solid var(--line);}
+  .confirm-msg{font-size:15px;line-height:1.5;margin-bottom:18px;}
+  .confirm-actions{display:flex;gap:10px;}
+  .confirm-actions .btn{flex:1;}
+
+  #splash{
+    position:fixed;inset:0;z-index:9999;background:var(--bg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    opacity:0;animation:splashFadeIn .6s ease forwards;
+  }
+  #splash.splash-out{animation:splashFadeOut .5s ease forwards;pointer-events:none;}
+  .splash-logo{width:96px;height:96px;border-radius:22px;box-shadow:0 10px 34px rgba(255,90,54,0.28);
+    transform:scale(0.85);opacity:0;animation:splashPop .6s ease forwards;}
+  .splash-title{font-size:20px;font-weight:800;letter-spacing:-0.02em;opacity:0;
+    animation:splashTitleIn .6s ease .15s forwards;}
+  .splash-title span{color:var(--accent);}
+  @keyframes splashFadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes splashFadeOut{from{opacity:1;}to{opacity:0;}}
+  @keyframes splashPop{from{transform:scale(0.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+  @keyframes splashTitleIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
+<div id="splash">
+  <svg class="splash-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <rect width="512" height="512" rx="113" fill="var(--bg)"/>
+    <rect x="95" y="239" width="14" height="33" rx="6" fill="var(--accent)"/>
+    <rect x="119" y="197" width="27" height="117" rx="10" fill="var(--accent)"/>
+    <rect x="156" y="173" width="32" height="164" rx="12" fill="var(--accent)"/>
+    <rect x="199" y="239" width="114" height="33" rx="6" fill="var(--accent)"/>
+    <rect x="324" y="173" width="32" height="164" rx="12" fill="var(--accent)"/>
+    <rect x="366" y="197" width="27" height="117" rx="10" fill="var(--accent)"/>
+    <rect x="403" y="239" width="14" height="33" rx="6" fill="var(--accent)"/>
+  </svg>
+  <div class="splash-title">PT <span>de bolso</span></div>
+</div>
 <div id="app"></div>
 
 <script>
 /* ====================== EXERCISE DATABASE ====================== */
 const EXO = {
   peito: [
-    {id:'peito_supino_inc_halt', imgs:['img/peito_supino_inc_halt_0.jpg','img/peito_supino_inc_halt_1.jpg'], name:'Supino inclinado com halteres', sets:4, min:8, max:12, rest:90, inc:2, calibStart:8, note:'Banco a 20–30°. O exercício mais importante para o peitoral superior.'},
+    {id:'peito_supino_inc_halt', imgs:['img/peito_supino_inc_halt_0.jpg','img/peito_supino_inc_halt_1.jpg'], name:'Supino inclinado com halteres', sets:4, min:8, max:12, rest:90, inc:2.5, calibStart:7.5, dumbbell:true, note:'Banco a 20–30°. O exercício mais importante para o peitoral superior.'},
     {id:'peito_chest_press', imgs:['img/peito_chest_press_0.jpg','img/peito_chest_press_1.jpg'], name:'Chest press (máquina)', sets:3, min:10, max:12, rest:90, inc:5, calibStart:20, note:'Boa opção para aprenderes o movimento com controlo total.'},
     {id:'peito_crossover', imgs:['img/peito_crossover_0.jpg','img/peito_crossover_1.jpg'], name:'Crossover de cabos', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:5, note:'Cruza as mãos no fim do movimento e contrai 1 segundo.'},
     {id:'peito_pec_deck', imgs:['img/peito_pec_deck_0.jpg','img/peito_pec_deck_1.jpg'], name:'Pec deck', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:'Amplitude controlada — não precisas de peso elevado.'},
@@ -241,26 +283,26 @@ const EXO = {
   costas: [
     {id:'costas_pulldown', imgs:['img/costas_pulldown_0.jpg','img/costas_pulldown_1.jpg'], name:'Puxada ao peito (lat pulldown)', sets:4, min:8, max:12, rest:90, inc:2.5, calibStart:20, note:'Leva os cotovelos para baixo — não puxes só com as mãos.'},
     {id:'costas_remada_sent', imgs:['img/costas_remada_sent_0.jpg','img/costas_remada_sent_1.jpg'], name:'Remada sentada (máquina/cabo)', sets:3, min:10, max:12, rest:90, inc:2.5, calibStart:20, note:''},
-    {id:'costas_remada_uni', imgs:['img/costas_remada_uni_0.jpg','img/costas_remada_uni_1.jpg'], name:'Remada unilateral com haltere', sets:3, min:10, max:10, rest:75, inc:1, calibStart:8, note:'Cada lado.'},
+    {id:'costas_remada_uni', imgs:['img/costas_remada_uni_0.jpg','img/costas_remada_uni_1.jpg'], name:'Remada unilateral com haltere', sets:3, min:10, max:10, rest:75, inc:2.5, calibStart:7.5, dumbbell:true, note:'Cada lado.'},
     {id:'costas_pulldown_est', imgs:['img/costas_pulldown_est_0.jpg','img/costas_pulldown_est_1.jpg'], name:'Pulldown de braços estendidos', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:10, note:'Ótimo para aprenderes a sentir os dorsais.'},
     {id:'costas_pullover', imgs:['img/costas_pullover_0.jpg','img/costas_pullover_1.jpg'], name:'Pullover (máquina/cabo)', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:10, note:''}
   ],
   pernas: [
     {id:'pernas_legpress', imgs:['img/pernas_legpress_0.jpg','img/pernas_legpress_1.jpg'], name:'Leg press', sets:4, min:10, max:12, rest:90, inc:5, calibStart:40, note:''},
-    {id:'pernas_rdl', imgs:['img/pernas_rdl_0.jpg','img/pernas_rdl_1.jpg'], name:'Levantamento romeno com halteres', sets:3, min:8, max:12, rest:90, inc:2, calibStart:8, note:'Começa leve para dominares a técnica — foca nos posteriores da coxa.'},
+    {id:'pernas_rdl', imgs:['img/pernas_rdl_0.jpg','img/pernas_rdl_1.jpg'], name:'Levantamento romeno com halteres', sets:3, min:8, max:12, rest:90, inc:2.5, calibStart:7.5, dumbbell:true, note:'Começa leve para dominares a técnica — foca nos posteriores da coxa.'},
     {id:'pernas_extensao', imgs:['img/pernas_extensao_0.jpg','img/pernas_extensao_1.jpg'], name:'Extensão de pernas', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
     {id:'pernas_flexao', imgs:['img/pernas_flexao_0.jpg','img/pernas_flexao_1.jpg'], name:'Flexão de pernas (leg curl)', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
     {id:'pernas_gemeos', imgs:['img/pernas_gemeos_0.jpg','img/pernas_gemeos_1.jpg'], name:'Elevação de gémeos', sets:4, min:12, max:15, rest:60, inc:5, calibStart:20, note:''}
   ],
   ombros: [
-    {id:'ombros_elev_lat', imgs:['img/ombros_elev_lat_0.jpg','img/ombros_elev_lat_1.jpg'], name:'Elevação lateral', sets:4, min:12, max:15, rest:60, inc:1, calibStart:3, note:'Prioriza técnica limpa sobre peso alto — sem balanço do corpo.'},
+    {id:'ombros_elev_lat', imgs:['img/ombros_elev_lat_0.jpg','img/ombros_elev_lat_1.jpg'], name:'Elevação lateral', sets:4, min:12, max:15, rest:60, inc:2.5, calibStart:2.5, dumbbell:true, note:'Prioriza técnica limpa sobre peso alto — sem balanço do corpo.'},
     {id:'ombros_facepull', imgs:['img/ombros_facepull_0.jpg','img/ombros_facepull_1.jpg'], name:'Face pull', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:8, note:'Importante para a saúde e mobilidade dos ombros.'},
     {id:'ombros_reverse_deck', imgs:['img/ombros_reverse_deck_0.jpg','img/ombros_reverse_deck_1.jpg'], name:'Reverse pec deck', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:10, note:'Deltoide posterior.'},
     {id:'ombros_desenv', imgs:['img/ombros_desenv_0.jpg','img/ombros_desenv_1.jpg'], name:'Desenvolvimento de ombros (máquina)', sets:3, min:8, max:12, rest:90, inc:2.5, calibStart:10, note:''}
   ],
   biceps: [
-    {id:'biceps_direta', imgs:['img/biceps_direta_0.jpg','img/biceps_direta_1.jpg'], name:'Rosca direta com halteres', sets:3, min:10, max:12, rest:60, inc:1, calibStart:5, note:''},
-    {id:'biceps_martelo', imgs:['img/biceps_martelo_0.jpg','img/biceps_martelo_1.jpg'], name:'Rosca martelo', sets:3, min:10, max:12, rest:60, inc:1, calibStart:5, note:''}
+    {id:'biceps_direta', imgs:['img/biceps_direta_0.jpg','img/biceps_direta_1.jpg'], name:'Rosca direta com halteres', sets:3, min:10, max:12, rest:60, inc:2.5, calibStart:5, dumbbell:true, note:''},
+    {id:'biceps_martelo', imgs:['img/biceps_martelo_0.jpg','img/biceps_martelo_1.jpg'], name:'Rosca martelo', sets:3, min:10, max:12, rest:60, inc:2.5, calibStart:5, dumbbell:true, note:''}
   ],
   triceps: [
     {id:'triceps_corda', imgs:['img/triceps_corda_0.jpg','img/triceps_corda_1.jpg'], name:'Tríceps na polia com corda', sets:3, min:10, max:15, rest:60, inc:1.25, calibStart:10, note:''},
@@ -324,8 +366,11 @@ function loadStore(){
   try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return {}; }
 }
 function saveStore(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+const DEFAULT_REP_TARGETS = {iniciante:12, intermedio:14, avancado:16};
+
 let DB = loadStore();
 DB.logs = DB.logs || {};
+if (DB.profile && !DB.profile.repTargets) DB.profile.repTargets = {...DEFAULT_REP_TARGETS};
 function persist(){ saveStore(DB); }
 
 /* ====================== PLAN GENERATION ====================== */
@@ -335,6 +380,19 @@ function pickCardio(idx){
 }
 function stepForInc(inc){ return inc>=2 ? 2.5 : (inc>=1 ? 1 : 0.5); }
 function roundToStep(v, step){ return Math.round(v/step)*step; }
+
+const DUMBBELL_MIN = 2.5, DUMBBELL_MAX = 50;
+// Snaps a weight to a value that actually exists as a physical plate/dumbbell.
+// Dumbbells only come in fixed 2.5kg increments up to 50kg in commercial gyms;
+// machines/cables keep their own finer step (defined per exercise via `inc`).
+function snapWeight(ex, w){
+  if (w == null) return w;
+  if (ex.dumbbell){
+    const snapped = Math.round(w/2.5)*2.5;
+    return Math.max(DUMBBELL_MIN, Math.min(DUMBBELL_MAX, snapped));
+  }
+  return roundToStep(w, stepForInc(ex.inc || 2.5));
+}
 
 function schemeForObjective(){
   return (DB.profile && DB.profile.objetivo === 'massa') ? 'piramide' : 'reta';
@@ -348,20 +406,27 @@ function objectiveSchemeNote(obj){
 
 // Builds the per-set targets for one exercise. "weight" is the exercise's
 // reference/working weight (the heaviest set, for pyramid schemes).
+function repsTargetForEx(ex){
+  if (ex.unit === 'seg') return ex.max; // timed holds (plank, etc.) keep their own range
+  const targets = (DB.profile && DB.profile.repTargets) || DEFAULT_REP_TARGETS;
+  const t = targets[DB.profile.nivel] != null ? targets[DB.profile.nivel] : ex.max;
+  return Math.max(ex.min, t);
+}
+
 function computeSetPlan(ex, sets, weight){
   const usesPyramid = !ex.bodyweight && ex.unit !== 'seg' && schemeForObjective() === 'piramide';
-  const step = stepForInc(ex.inc || 2.5);
+  const targetMax = repsTargetForEx(ex);
   const arr = [];
   let prevW = null;
   for (let i=0; i<sets; i++){
-    let reps = ex.max;
+    let reps = targetMax;
     let w = weight;
     if (usesPyramid && sets > 1){
-      reps = Math.round(ex.max - i*(ex.max-ex.min)/(sets-1));
-      reps = Math.max(ex.min, Math.min(ex.max, reps));
+      reps = Math.round(targetMax - i*(targetMax-ex.min)/(sets-1));
+      reps = Math.max(ex.min, Math.min(targetMax, reps));
       if (weight != null){
         const frac = 0.72 + 0.28 * (i/(sets-1)); // ramps from ~72% up to 100% of the working weight
-        w = roundToStep(weight*frac, step);
+        w = snapWeight(ex, weight*frac);
         if (prevW != null && w < prevW) w = prevW;
       }
     }
@@ -379,7 +444,7 @@ function buildExerciseInstance(def, group, isFocus){
     id: def.id, name: def.name, group, isFocus: !!isFocus,
     unit: def.unit || 'reps', bodyweight: !!def.bodyweight, imgs: def.imgs || null,
     min: def.min, max: def.max, rest: def.rest, note: def.note || '', inc: def.inc || 2.5,
-    calibStart: def.calibStart || 5,
+    calibStart: def.calibStart || 5, dumbbell: !!def.dumbbell,
     done: false, cursor: 0
   };
   ex.setPlan = computeSetPlan(ex, sets, lastWeight);
@@ -448,11 +513,50 @@ const app = document.getElementById('app');
 function h(html){ app.innerHTML = html; }
 function on(sel, evt, fn){ app.querySelectorAll(sel).forEach(el => el.addEventListener(evt, fn)); }
 
+// Custom confirmation overlay — window.confirm() is unreliable (often silently
+// suppressed) in standalone/home-screen installed PWAs, especially on iOS.
+function showConfirm(message, onConfirm){
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-msg">${message}</div>
+      <div class="confirm-actions">
+        <button class="btn ghost" id="confirm-cancel">Cancelar</button>
+        <button class="btn primary" id="confirm-ok">Confirmar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirm-cancel').onclick = ()=> overlay.remove();
+  overlay.querySelector('#confirm-ok').onclick = ()=>{ overlay.remove(); onConfirm(); };
+}
+
+const BRAND_LOGO_SVG = `<svg class="brand-logo" viewBox="87 165 338 180" xmlns="http://www.w3.org/2000/svg">
+  <rect x="95" y="239" width="14" height="33" rx="6" fill="var(--accent)"/>
+  <rect x="119" y="197" width="27" height="117" rx="10" fill="var(--accent)"/>
+  <rect x="156" y="173" width="32" height="164" rx="12" fill="var(--accent)"/>
+  <rect x="199" y="239" width="114" height="33" rx="6" fill="var(--accent)"/>
+  <rect x="324" y="173" width="32" height="164" rx="12" fill="var(--accent)"/>
+  <rect x="366" y="197" width="27" height="117" rx="10" fill="var(--accent)"/>
+  <rect x="403" y="239" width="14" height="33" rx="6" fill="var(--accent)"/>
+</svg>`;
+
+const GEAR_SVG = (()=>{
+  const teeth = Array.from({length:8}, (_,i) =>
+    `<rect x="10.2" y="0.8" width="3.6" height="4.6" rx="1.3" fill="var(--muted)" transform="rotate(${i*45} 12 12)"/>`
+  ).join('');
+  return `<svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+    ${teeth}
+    <circle cx="12" cy="12" r="7.4" fill="var(--muted)"/>
+    <circle cx="12" cy="12" r="3.5" fill="var(--surface)"/>
+  </svg>`;
+})();
+
 function topbar(title, opts){
   opts = opts || {};
   return `<div class="topbar">
-    <div class="brand">PT <span>de bolso</span></div>
-    ${opts.settings ? '<div class="iconbtn" id="btn-settings">⚙️</div>' : '<div style="width:38px"></div>'}
+    <div class="brand">${BRAND_LOGO_SVG}PT <span>de bolso</span></div>
+    ${opts.settings ? `<div class="iconbtn" id="btn-settings">${GEAR_SVG}</div>` : '<div style="width:38px"></div>'}
   </div>`;
 }
 
@@ -532,7 +636,7 @@ function renderOnboarding(){
 
   h(`
     <div class="screen">
-      <div class="topbar"><div class="brand">PT <span>de bolso</span></div><div style="width:38px"></div></div>
+      <div class="topbar"><div class="brand">${BRAND_LOGO_SVG}PT <span>de bolso</span></div><div style="width:38px"></div></div>
       <div class="progressdots">${Array.from({length:OB_STEPS},(_,i)=>`<span class="${i<=s?'on':''}"></span>`).join('')}</div>
       ${body}
       <div class="btnbar">
@@ -584,7 +688,7 @@ function renderOnboarding(){
   }
 }
 function finishOnboarding(){
-  DB.profile = {...ob.data, createdAt: new Date().toISOString()};
+  DB.profile = {...ob.data, repTargets: {...DEFAULT_REP_TARGETS}, createdAt: new Date().toISOString()};
   DB.plan = generatePlan(DB.profile);
   DB.completion = {};
   persist();
@@ -676,9 +780,23 @@ function renderDay(){
       <h1 style="margin-top:8px;font-size:22px;">${day.label}</h1>
       <p class="lead" style="margin-bottom:14px;">${done}/${total} exercícios concluídos hoje</p>
       <div>${rows}</div>
+      ${done>0 ? `<div class="btnbar" style="margin-top:24px;"><button class="btn primary full" id="btn-reset-day">Reiniciar</button></div>` : ''}
     </div>
   `);
   app.querySelector('#btn-back').onclick = ()=>{ view='dashboard'; render(); };
+  const resetBtn = app.querySelector('#btn-reset-day');
+  if (resetBtn) resetBtn.onclick = ()=>{
+    showConfirm('Isto limpa o progresso deste dia. Continuar?', ()=>{
+      const comp2 = todaysCompletion();
+      day.exercises.forEach(ex => {
+        delete comp2[day.dayId+'_'+ex.id];
+        ex.done = false;
+        if (ex.setPlan) ex.cursor = 0;
+      });
+      persist();
+      renderDay();
+    });
+  };
   on('.exrow','click', e=>{
     activeExIndex = parseInt(e.currentTarget.dataset.idx,10);
     view='runner';
@@ -709,7 +827,7 @@ function finishStrengthExercise(ex){
   if (usedWeight != null){
     log.topStreak = allTop ? (log.topStreak||0)+1 : 0;
     if (log.topStreak >= 2){
-      leveledTo = +(usedWeight + ex.inc).toFixed(2);
+      leveledTo = snapWeight(ex, usedWeight + ex.inc);
       log.lastWeight = leveledTo;
       log.topStreak = 0;
     } else {
@@ -770,10 +888,22 @@ function renderRunner(){
   return renderStrengthRunner(day, ex);
 }
 
+function levelIcon(activeCount){
+  const bars = [{x:4,y:26,h:18},{x:19,y:16,h:28},{x:34,y:6,h:38}];
+  const rects = bars.map((b,i) => {
+    const filled = i < activeCount;
+    return filled
+      ? `<rect x="${b.x}" y="${b.y}" width="10" height="${b.h}" rx="3" fill="var(--accent)"/>`
+      : `<rect x="${b.x}" y="${b.y}" width="10" height="${b.h}" rx="3" fill="none" stroke="var(--muted-2)" stroke-width="2.5"/>`;
+  }).join('');
+  return `<svg class="rate-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
+}
+
 function renderCalibration(day, ex){
   if (ex._calibW == null) ex._calibW = ex.calibStart;
   const phase = ex._calibPhase || 'test';
-  const step = ex.inc >= 2 ? 2.5 : (ex.inc >= 1 ? 1 : 0.5);
+  const step = ex.dumbbell ? 2.5 : (ex.inc >= 2 ? 2.5 : (ex.inc >= 1 ? 1 : 0.5));
+  const minW = ex.dumbbell ? DUMBBELL_MIN : step;
 
   if (phase === 'test'){
     h(`
@@ -810,8 +940,8 @@ function renderCalibration(day, ex){
       </div>
     `);
     app.querySelector('#btn-exit').onclick = ()=>{ ex._calibPhase=null; ex._calibW=null; view='day'; render(); };
-    app.querySelector('#c-minus').onclick = ()=>{ ex._calibW = Math.max(step, +(ex._calibW-step).toFixed(2)); app.querySelector('#c-val').textContent = ex._calibW; };
-    app.querySelector('#c-plus').onclick = ()=>{ ex._calibW = +(ex._calibW+step).toFixed(2); app.querySelector('#c-val').textContent = ex._calibW; };
+    app.querySelector('#c-minus').onclick = ()=>{ ex._calibW = Math.max(minW, +(ex._calibW-step).toFixed(2)); app.querySelector('#c-val').textContent = ex._calibW; };
+    app.querySelector('#c-plus').onclick = ()=>{ const maxW = ex.dumbbell ? DUMBBELL_MAX : Infinity; ex._calibW = Math.min(maxW, +(ex._calibW+step).toFixed(2)); app.querySelector('#c-val').textContent = ex._calibW; };
     app.querySelector('#c-skip').onclick = ()=>{ applyCalibratedWeight(ex, ex._calibW); };
     app.querySelector('#c-next').onclick = ()=>{ ex._calibPhase = 'rate'; render(); };
     wireCarousel();
@@ -829,26 +959,25 @@ function renderCalibration(day, ex){
             <div class="runner-setlabel">3 repetições de teste em ${ex.name}</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
-            <div class="toggle-opt" id="rate-facil" style="text-align:left;padding:18px;">😌 &nbsp; <b>Fácil</b> — dava para fazer muitas mais</div>
-            <div class="toggle-opt" id="rate-medio" style="text-align:left;padding:18px;">😐 &nbsp; <b>Médio</b> — esforço moderado</div>
-            <div class="toggle-opt" id="rate-dificil" style="text-align:left;padding:18px;">😰 &nbsp; <b>Desafiante</b> — já custou terminar</div>
+            <div class="toggle-opt rate-row" id="rate-facil">${levelIcon(1)}<div><b>Fácil</b><div class="rate-sub">dava para fazer muitas mais</div></div></div>
+            <div class="toggle-opt rate-row" id="rate-medio">${levelIcon(2)}<div><b>Médio</b><div class="rate-sub">esforço moderado</div></div></div>
+            <div class="toggle-opt rate-row" id="rate-dificil">${levelIcon(3)}<div><b>Desafiante</b><div class="rate-sub">já custou terminar</div></div></div>
           </div>
         </div>
       </div>
     `);
     app.querySelector('#btn-exit').onclick = ()=>{ ex._calibPhase='test'; render(); };
-    app.querySelector('#rate-facil').onclick = ()=> finalizeCalibration(ex, 'facil', step);
-    app.querySelector('#rate-medio').onclick = ()=> finalizeCalibration(ex, 'medio', step);
-    app.querySelector('#rate-dificil').onclick = ()=> finalizeCalibration(ex, 'dificil', step);
+    app.querySelector('#rate-facil').onclick = ()=> finalizeCalibration(ex, 'facil');
+    app.querySelector('#rate-medio').onclick = ()=> finalizeCalibration(ex, 'medio');
+    app.querySelector('#rate-dificil').onclick = ()=> finalizeCalibration(ex, 'dificil');
   }
 }
 
-function finalizeCalibration(ex, level, step){
+function finalizeCalibration(ex, level){
   const mult = {facil:1.5, medio:1.15, dificil:0.85}[level];
-  let w = ex._calibW * mult;
-  w = Math.round(w/step)*step;
-  if (w <= 0) w = step;
-  applyCalibratedWeight(ex, +w.toFixed(2));
+  let w = snapWeight(ex, ex._calibW * mult);
+  if (w <= 0) w = ex.dumbbell ? DUMBBELL_MIN : (stepForInc(ex.inc||2.5));
+  applyCalibratedWeight(ex, w);
 }
 
 function applyCalibratedWeight(ex, weight){
@@ -889,9 +1018,7 @@ function renderStrengthRunner(day, ex){
           <div class="bignums">
             <div class="numblock">
               <div class="numctrls">
-                <div class="microbtn" id="reps-minus">−</div>
                 <div class="numval" id="reps-val">${sp.reps}</div>
-                <div class="microbtn" id="reps-plus">+</div>
               </div>
               <div class="numlabel">${unitLabel}</div>
             </div>
@@ -918,13 +1045,19 @@ function renderStrengthRunner(day, ex){
   `);
 
   app.querySelector('#btn-exit').onclick = ()=>{ view='day'; render(); };
-  const repsInc = ex.unit==='seg' ? 5 : 1;
-  app.querySelector('#reps-minus').onclick = ()=>{ sp.reps = Math.max(1, sp.reps-repsInc); app.querySelector('#reps-val').textContent = sp.reps; };
-  app.querySelector('#reps-plus').onclick = ()=>{ sp.reps = sp.reps+repsInc; app.querySelector('#reps-val').textContent = sp.reps; };
   const wMinus = app.querySelector('#w-minus'), wPlus = app.querySelector('#w-plus');
   if (wMinus){
-    wMinus.onclick = ()=>{ sp.weight = +(((sp.weight||0) - ex.inc).toFixed(2)); if(sp.weight<0)sp.weight=0; app.querySelector('#w-val').textContent = sp.weight; };
-    wPlus.onclick = ()=>{ sp.weight = +(((sp.weight||0) + ex.inc).toFixed(2)); app.querySelector('#w-val').textContent = sp.weight; };
+    const wStep = ex.dumbbell ? 2.5 : ex.inc;
+    wMinus.onclick = ()=>{
+      const floor = ex.dumbbell ? DUMBBELL_MIN : 0;
+      sp.weight = Math.max(floor, +(((sp.weight||0) - wStep).toFixed(2)));
+      app.querySelector('#w-val').textContent = sp.weight;
+    };
+    wPlus.onclick = ()=>{
+      const ceil = ex.dumbbell ? DUMBBELL_MAX : Infinity;
+      sp.weight = Math.min(ceil, +(((sp.weight||0) + wStep).toFixed(2)));
+      app.querySelector('#w-val').textContent = sp.weight;
+    };
   }
   const recalib = app.querySelector('#w-recalib');
   if (recalib) recalib.onclick = ()=>{ ex.setPlan.forEach(s=>s.weight=null); ex._calibPhase=null; ex._calibW=null; render(); };
@@ -1095,11 +1228,12 @@ function renderSettings(){
       ${row('altura_peso', 'Altura / Peso', `${p.altura} cm · ${p.peso} kg`)}
       ${row('objetivo', 'Objetivo', OBJ_LABELS[p.objetivo])}
       ${row('nivel', 'Nível', NIVEL_LABELS[p.nivel])}
+      ${row('repTargets', 'Repetições por nível', `${p.repTargets.iniciante} / ${p.repTargets.intermedio} / ${p.repTargets.avancado}`)}
       ${row('dias', 'Dias por semana', `${p.dias}×`)}
       ${row('foco', 'Prioridades', focoLabel)}
       ${row('limitacoes', 'Limitações', p.limitacoes ? p.limitacoes : 'Nenhuma')}
       <div class="btnbar" style="margin-top:20px;">
-        <button class="btn ghost full" id="btn-redo">Recomeçar do zero (questionário)</button>
+        <button class="btn primary full" id="btn-redo">Reconfigurar</button>
       </div>
     </div>
   `);
@@ -1112,21 +1246,27 @@ function renderSettings(){
     render();
   });
   app.querySelector('#btn-redo').onclick = ()=>{
-    if (confirm('Isto substitui o teu plano atual. Continuar?')){
+    showConfirm('Isto substitui o teu plano atual. Continuar?', ()=>{
       DB.profile=null; DB.plan=null; DB.completion={};
       persist();
       settingsDraft = null; settingsField = null;
       ob = {step:0, data:{altura:'', peso:'', objetivo:null, nivel:null, dias:null, foco:[], suplementos:null, limitacoes:''}};
       view='onboarding'; render();
-    }
+    });
   };
 }
 
 /* ====================== SETTINGS: DEDICATED FIELD SCREEN ====================== */
 function commitSettingsDraft(){
   const d = settingsDraft;
+  if (d.repTargets){
+    d.repTargets.iniciante = Math.max(1, Math.round(+d.repTargets.iniciante || DEFAULT_REP_TARGETS.iniciante));
+    d.repTargets.intermedio = Math.max(d.repTargets.iniciante, Math.round(+d.repTargets.intermedio || d.repTargets.iniciante));
+    d.repTargets.avancado = Math.max(d.repTargets.intermedio, Math.round(+d.repTargets.avancado || d.repTargets.intermedio));
+  }
   const structural = d.objetivo!==DB.profile.objetivo || d.nivel!==DB.profile.nivel ||
-                      d.dias!==DB.profile.dias || JSON.stringify(d.foco)!==JSON.stringify(DB.profile.foco);
+                      d.dias!==DB.profile.dias || JSON.stringify(d.foco)!==JSON.stringify(DB.profile.foco) ||
+                      JSON.stringify(d.repTargets)!==JSON.stringify(DB.profile.repTargets);
   DB.profile = d;
   if (structural){
     DB.plan = generatePlan(DB.profile);
@@ -1165,6 +1305,15 @@ function renderSettingsField(){
       <div class="choices">
         ${['iniciante','intermedio','avancado'].map(v => `<div class="chip ${d.nivel===v?'active':''}" data-v="${v}">${NIVEL_LABELS[v]}</div>`).join('')}
       </div>
+    `;
+  } else if (f === 'repTargets'){
+    title = 'Repetições por nível';
+    body = `
+      <p class="lead" style="margin-top:8px;">Repetições-alvo para exercícios contados em repetições (não afeta pranchas e exercícios cronometrados). O peso ainda se ajusta durante a série — as repetições não.</p>
+      <div class="field"><label>Fácil (iniciante)</label><input type="number" inputmode="numeric" id="rt-iniciante" value="${d.repTargets.iniciante}"></div>
+      <div class="field"><label>Médio (intermédio)</label><input type="number" inputmode="numeric" id="rt-intermedio" value="${d.repTargets.intermedio}"></div>
+      <div class="field"><label>Difícil (avançado)</label><input type="number" inputmode="numeric" id="rt-avancado" value="${d.repTargets.avancado}"></div>
+      <p class="disclaimer">Médio e difícil são sempre iguais ou superiores ao fácil — ajustamos automaticamente se não forem.</p>
     `;
   } else if (f === 'dias'){
     title = 'Dias por semana';
@@ -1214,6 +1363,11 @@ function renderSettingsField(){
   }
   if (f === 'objetivo' || f === 'nivel'){
     on('.chip[data-v]','click', e=>{ d[f] = e.target.dataset.v; renderSettingsField(); });
+  }
+  if (f === 'repTargets'){
+    app.querySelector('#rt-iniciante').oninput = e => d.repTargets.iniciante = e.target.value;
+    app.querySelector('#rt-intermedio').oninput = e => d.repTargets.intermedio = e.target.value;
+    app.querySelector('#rt-avancado').oninput = e => d.repTargets.avancado = e.target.value;
   }
   if (f === 'dias'){
     app.querySelector('#f-dias-menos').onclick = ()=>{ d.dias = Math.max(1, d.dias-1); renderSettingsField(); };
@@ -1287,6 +1441,14 @@ function render(){
   if (view==='supplements') return renderSupplements();
 }
 render();
+
+/* ====================== SPLASH ====================== */
+setTimeout(()=>{
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  splash.classList.add('splash-out');
+  setTimeout(()=> splash.remove(), 550);
+}, 1100);
 
 /* ====================== SERVICE WORKER ====================== */
 if ('serviceWorker' in navigator){
