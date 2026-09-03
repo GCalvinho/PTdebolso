@@ -153,7 +153,14 @@
   .runner-exname{font-size:19px;font-weight:800;margin:0 0 2px;}
   .runner-setlabel{font-size:13px;color:var(--muted);}
   .exphoto{width:100%;height:170px;border-radius:16px;object-fit:cover;object-position:center 25%;margin:12px 0 2px;background:var(--surface);display:block;}
-  .exphoto-cap{font-size:11px;color:var(--muted-2);margin-bottom:2px;}
+  .exphoto-cap{font-size:11px;color:var(--muted-2);text-align:center;margin:6px 0 0;}
+  .excarousel{margin:12px 0 2px;}
+  .excarousel-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .excarousel-track::-webkit-scrollbar{display:none;}
+  .excarousel-img{flex:0 0 100%;width:100%;height:170px;object-fit:cover;object-position:center 25%;scroll-snap-align:start;background:var(--surface);}
+  .excarousel-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
+  .excarousel-dots .dot{width:6px;height:6px;border-radius:50%;background:var(--line);transition:all .15s;}
+  .excarousel-dots .dot.active{background:var(--accent);width:16px;border-radius:3px;}
   .setdots{display:flex;gap:5px;margin:12px 0 4px;}
   .setdots span{width:8px;height:8px;border-radius:50%;background:var(--line);}
   .setdots span.done{background:var(--good);}
@@ -224,47 +231,47 @@
 /* ====================== EXERCISE DATABASE ====================== */
 const EXO = {
   peito: [
-    {id:'peito_supino_inc_halt', img:'img/peito_supino_inc_halt.jpg', name:'Supino inclinado com halteres', sets:4, min:8, max:12, rest:90, inc:2, calibStart:8, note:'Banco a 20–30°. O exercício mais importante para o peitoral superior.'},
-    {id:'peito_chest_press', img:'img/peito_chest_press.jpg', name:'Chest press (máquina)', sets:3, min:10, max:12, rest:90, inc:5, calibStart:20, note:'Boa opção para aprenderes o movimento com controlo total.'},
-    {id:'peito_crossover', img:'img/peito_crossover.jpg', name:'Crossover de cabos', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:5, note:'Cruza as mãos no fim do movimento e contrai 1 segundo.'},
-    {id:'peito_pec_deck', img:'img/peito_pec_deck.jpg', name:'Pec deck', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:'Amplitude controlada — não precisas de peso elevado.'},
-    {id:'peito_crossover_baixo', img:'img/peito_crossover_baixo.jpg', name:'Crossover baixo → alto', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:5, note:'Ênfase extra na parte superior do peito.'},
-    {id:'peito_supino_plano', img:'img/peito_supino_plano.jpg', name:'Supino plano (máquina/Smith)', sets:3, min:8, max:12, rest:90, inc:2.5, calibStart:20, note:'Constrói massa geral no peitoral.'}
+    {id:'peito_supino_inc_halt', imgs:['img/peito_supino_inc_halt_0.jpg','img/peito_supino_inc_halt_1.jpg'], name:'Supino inclinado com halteres', sets:4, min:8, max:12, rest:90, inc:2, calibStart:8, note:'Banco a 20–30°. O exercício mais importante para o peitoral superior.'},
+    {id:'peito_chest_press', imgs:['img/peito_chest_press_0.jpg','img/peito_chest_press_1.jpg'], name:'Chest press (máquina)', sets:3, min:10, max:12, rest:90, inc:5, calibStart:20, note:'Boa opção para aprenderes o movimento com controlo total.'},
+    {id:'peito_crossover', imgs:['img/peito_crossover_0.jpg','img/peito_crossover_1.jpg'], name:'Crossover de cabos', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:5, note:'Cruza as mãos no fim do movimento e contrai 1 segundo.'},
+    {id:'peito_pec_deck', imgs:['img/peito_pec_deck_0.jpg','img/peito_pec_deck_1.jpg'], name:'Pec deck', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:'Amplitude controlada — não precisas de peso elevado.'},
+    {id:'peito_crossover_baixo', imgs:['img/peito_crossover_baixo_0.jpg','img/peito_crossover_baixo_1.jpg'], name:'Crossover baixo → alto', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:5, note:'Ênfase extra na parte superior do peito.'},
+    {id:'peito_supino_plano', imgs:['img/peito_supino_plano_0.jpg','img/peito_supino_plano_1.jpg'], name:'Supino plano (máquina/Smith)', sets:3, min:8, max:12, rest:90, inc:2.5, calibStart:20, note:'Constrói massa geral no peitoral.'}
   ],
   costas: [
-    {id:'costas_pulldown', img:'img/costas_pulldown.jpg', name:'Puxada ao peito (lat pulldown)', sets:4, min:8, max:12, rest:90, inc:2.5, calibStart:20, note:'Leva os cotovelos para baixo — não puxes só com as mãos.'},
-    {id:'costas_remada_sent', img:'img/costas_remada_sent.jpg', name:'Remada sentada (máquina/cabo)', sets:3, min:10, max:12, rest:90, inc:2.5, calibStart:20, note:''},
-    {id:'costas_remada_uni', img:'img/costas_remada_uni.jpg', name:'Remada unilateral com haltere', sets:3, min:10, max:10, rest:75, inc:1, calibStart:8, note:'Cada lado.'},
-    {id:'costas_pulldown_est', img:'img/costas_pulldown_est.jpg', name:'Pulldown de braços estendidos', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:10, note:'Ótimo para aprenderes a sentir os dorsais.'},
-    {id:'costas_pullover', img:'img/costas_pullover.jpg', name:'Pullover (máquina/cabo)', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:10, note:''}
+    {id:'costas_pulldown', imgs:['img/costas_pulldown_0.jpg','img/costas_pulldown_1.jpg'], name:'Puxada ao peito (lat pulldown)', sets:4, min:8, max:12, rest:90, inc:2.5, calibStart:20, note:'Leva os cotovelos para baixo — não puxes só com as mãos.'},
+    {id:'costas_remada_sent', imgs:['img/costas_remada_sent_0.jpg','img/costas_remada_sent_1.jpg'], name:'Remada sentada (máquina/cabo)', sets:3, min:10, max:12, rest:90, inc:2.5, calibStart:20, note:''},
+    {id:'costas_remada_uni', imgs:['img/costas_remada_uni_0.jpg','img/costas_remada_uni_1.jpg'], name:'Remada unilateral com haltere', sets:3, min:10, max:10, rest:75, inc:1, calibStart:8, note:'Cada lado.'},
+    {id:'costas_pulldown_est', imgs:['img/costas_pulldown_est_0.jpg','img/costas_pulldown_est_1.jpg'], name:'Pulldown de braços estendidos', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:10, note:'Ótimo para aprenderes a sentir os dorsais.'},
+    {id:'costas_pullover', imgs:['img/costas_pullover_0.jpg','img/costas_pullover_1.jpg'], name:'Pullover (máquina/cabo)', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:10, note:''}
   ],
   pernas: [
-    {id:'pernas_legpress', img:'img/pernas_legpress.jpg', name:'Leg press', sets:4, min:10, max:12, rest:90, inc:5, calibStart:40, note:''},
-    {id:'pernas_rdl', img:'img/pernas_rdl.jpg', name:'Levantamento romeno com halteres', sets:3, min:8, max:12, rest:90, inc:2, calibStart:8, note:'Começa leve para dominares a técnica — foca nos posteriores da coxa.'},
-    {id:'pernas_extensao', img:'img/pernas_extensao.jpg', name:'Extensão de pernas', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
-    {id:'pernas_flexao', img:'img/pernas_flexao.jpg', name:'Flexão de pernas (leg curl)', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
-    {id:'pernas_gemeos', img:'img/pernas_gemeos.jpg', name:'Elevação de gémeos', sets:4, min:12, max:15, rest:60, inc:5, calibStart:20, note:''}
+    {id:'pernas_legpress', imgs:['img/pernas_legpress_0.jpg','img/pernas_legpress_1.jpg'], name:'Leg press', sets:4, min:10, max:12, rest:90, inc:5, calibStart:40, note:''},
+    {id:'pernas_rdl', imgs:['img/pernas_rdl_0.jpg','img/pernas_rdl_1.jpg'], name:'Levantamento romeno com halteres', sets:3, min:8, max:12, rest:90, inc:2, calibStart:8, note:'Começa leve para dominares a técnica — foca nos posteriores da coxa.'},
+    {id:'pernas_extensao', imgs:['img/pernas_extensao_0.jpg','img/pernas_extensao_1.jpg'], name:'Extensão de pernas', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
+    {id:'pernas_flexao', imgs:['img/pernas_flexao_0.jpg','img/pernas_flexao_1.jpg'], name:'Flexão de pernas (leg curl)', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
+    {id:'pernas_gemeos', imgs:['img/pernas_gemeos_0.jpg','img/pernas_gemeos_1.jpg'], name:'Elevação de gémeos', sets:4, min:12, max:15, rest:60, inc:5, calibStart:20, note:''}
   ],
   ombros: [
-    {id:'ombros_elev_lat', img:'img/ombros_elev_lat.jpg', name:'Elevação lateral', sets:4, min:12, max:15, rest:60, inc:1, calibStart:3, note:'Prioriza técnica limpa sobre peso alto — sem balanço do corpo.'},
-    {id:'ombros_facepull', img:'img/ombros_facepull.jpg', name:'Face pull', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:8, note:'Importante para a saúde e mobilidade dos ombros.'},
-    {id:'ombros_reverse_deck', img:'img/ombros_reverse_deck.jpg', name:'Reverse pec deck', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:10, note:'Deltoide posterior.'},
-    {id:'ombros_desenv', img:'img/ombros_desenv.jpg', name:'Desenvolvimento de ombros (máquina)', sets:3, min:8, max:12, rest:90, inc:2.5, calibStart:10, note:''}
+    {id:'ombros_elev_lat', imgs:['img/ombros_elev_lat_0.jpg','img/ombros_elev_lat_1.jpg'], name:'Elevação lateral', sets:4, min:12, max:15, rest:60, inc:1, calibStart:3, note:'Prioriza técnica limpa sobre peso alto — sem balanço do corpo.'},
+    {id:'ombros_facepull', imgs:['img/ombros_facepull_0.jpg','img/ombros_facepull_1.jpg'], name:'Face pull', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:8, note:'Importante para a saúde e mobilidade dos ombros.'},
+    {id:'ombros_reverse_deck', imgs:['img/ombros_reverse_deck_0.jpg','img/ombros_reverse_deck_1.jpg'], name:'Reverse pec deck', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:10, note:'Deltoide posterior.'},
+    {id:'ombros_desenv', imgs:['img/ombros_desenv_0.jpg','img/ombros_desenv_1.jpg'], name:'Desenvolvimento de ombros (máquina)', sets:3, min:8, max:12, rest:90, inc:2.5, calibStart:10, note:''}
   ],
   biceps: [
-    {id:'biceps_direta', img:'img/biceps_direta.jpg', name:'Rosca direta com halteres', sets:3, min:10, max:12, rest:60, inc:1, calibStart:5, note:''},
-    {id:'biceps_martelo', img:'img/biceps_martelo.jpg', name:'Rosca martelo', sets:3, min:10, max:12, rest:60, inc:1, calibStart:5, note:''}
+    {id:'biceps_direta', imgs:['img/biceps_direta_0.jpg','img/biceps_direta_1.jpg'], name:'Rosca direta com halteres', sets:3, min:10, max:12, rest:60, inc:1, calibStart:5, note:''},
+    {id:'biceps_martelo', imgs:['img/biceps_martelo_0.jpg','img/biceps_martelo_1.jpg'], name:'Rosca martelo', sets:3, min:10, max:12, rest:60, inc:1, calibStart:5, note:''}
   ],
   triceps: [
-    {id:'triceps_corda', img:'img/triceps_corda.jpg', name:'Tríceps na polia com corda', sets:3, min:10, max:15, rest:60, inc:1.25, calibStart:10, note:''},
-    {id:'triceps_acima', img:'img/triceps_acima.jpg', name:'Tríceps acima da cabeça com corda', sets:3, min:10, max:15, rest:60, inc:1.25, calibStart:7.5, note:''}
+    {id:'triceps_corda', imgs:['img/triceps_corda_0.jpg','img/triceps_corda_1.jpg'], name:'Tríceps na polia com corda', sets:3, min:10, max:15, rest:60, inc:1.25, calibStart:10, note:''},
+    {id:'triceps_acima', imgs:['img/triceps_acima_0.jpg','img/triceps_acima_1.jpg'], name:'Tríceps acima da cabeça com corda', sets:3, min:10, max:15, rest:60, inc:1.25, calibStart:7.5, note:''}
   ],
   abdominais: [
-    {id:'abs_prancha', img:'img/abs_prancha.jpg', name:'Prancha (plank)', sets:3, min:30, max:60, rest:45, unit:'seg', bodyweight:true, note:''},
-    {id:'abs_joelhos', img:'img/abs_joelhos.jpg', name:'Elevação de joelhos suspenso', sets:3, min:10, max:15, rest:60, bodyweight:true, note:''},
-    {id:'abs_cablecrunch', img:'img/abs_cablecrunch.jpg', name:'Crunch na polia', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
-    {id:'abs_deadbug', img:'img/abs_deadbug.jpg', name:'Dead bug', sets:3, min:8, max:12, rest:45, bodyweight:true, note:'Cada lado.'},
-    {id:'abs_pallof', img:'img/abs_pallof.jpg', name:'Pallof press', sets:3, min:10, max:12, rest:45, inc:1.25, calibStart:8, note:'Cada lado.'}
+    {id:'abs_prancha', imgs:['img/abs_prancha_0.jpg','img/abs_prancha_1.jpg'], name:'Prancha (plank)', sets:3, min:30, max:60, rest:45, unit:'seg', bodyweight:true, note:''},
+    {id:'abs_joelhos', imgs:['img/abs_joelhos_0.jpg','img/abs_joelhos_1.jpg'], name:'Elevação de joelhos suspenso', sets:3, min:10, max:15, rest:60, bodyweight:true, note:''},
+    {id:'abs_cablecrunch', imgs:['img/abs_cablecrunch_0.jpg','img/abs_cablecrunch_1.jpg'], name:'Crunch na polia', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
+    {id:'abs_deadbug', imgs:['img/abs_deadbug_0.jpg','img/abs_deadbug_1.jpg'], name:'Dead bug', sets:3, min:8, max:12, rest:45, bodyweight:true, note:'Cada lado.'},
+    {id:'abs_pallof', imgs:['img/abs_pallof_0.jpg','img/abs_pallof_1.jpg'], name:'Pallof press', sets:3, min:10, max:12, rest:45, inc:1.25, calibStart:8, note:'Cada lado.'}
   ],
   cardio: [
     {id:'cardio_continuo', name:'Cardio contínuo', minutes:25, note:'Ritmo moderado — dá para falar, mas não cantar.'},
@@ -370,7 +377,7 @@ function buildExerciseInstance(def, group, isFocus){
   const lastWeight = log && log.lastWeight != null ? log.lastWeight : null;
   const ex = {
     id: def.id, name: def.name, group, isFocus: !!isFocus,
-    unit: def.unit || 'reps', bodyweight: !!def.bodyweight, img: def.img || null,
+    unit: def.unit || 'reps', bodyweight: !!def.bodyweight, imgs: def.imgs || null,
     min: def.min, max: def.max, rest: def.rest, note: def.note || '', inc: def.inc || 2.5,
     calibStart: def.calibStart || 5,
     done: false, cursor: 0
@@ -728,6 +735,33 @@ function needsCalibration(ex){
   return !ex.bodyweight && (ex.setPlan[0].weight == null);
 }
 
+function carouselHTML(imgs, alt){
+  if (!imgs || !imgs.length) return '';
+  if (imgs.length === 1){
+    return `<img class="exphoto" src="${imgs[0]}" alt="${alt}">`;
+  }
+  return `
+    <div class="excarousel">
+      <div class="excarousel-track" id="excar-track">
+        ${imgs.map(src => `<img class="excarousel-img" src="${src}" alt="${alt}">`).join('')}
+      </div>
+      <div class="excarousel-dots" id="excar-dots">
+        ${imgs.map((_,i) => `<span class="dot ${i===0?'active':''}"></span>`).join('')}
+      </div>
+    </div>
+    <div class="exphoto-cap">desliza para ver a posição inicial → final</div>
+  `;
+}
+function wireCarousel(){
+  const track = app.querySelector('#excar-track');
+  const dots = app.querySelectorAll('#excar-dots .dot');
+  if (!track || !dots.length) return;
+  track.addEventListener('scroll', ()=>{
+    const idx = Math.round(track.scrollLeft / track.clientWidth);
+    dots.forEach((d,i) => d.classList.toggle('active', i===idx));
+  });
+}
+
 function renderRunner(){
   const day = currentDay();
   const ex = day.exercises[activeExIndex];
@@ -754,7 +788,7 @@ function renderCalibration(day, ex){
             <div class="runner-exname">${ex.name}</div>
             <div class="runner-setlabel">Ainda não sabemos o teu peso ideal para este exercício.</div>
           </div>
-          ${ex.img ? `<img class="exphoto" src="${ex.img}" alt="${ex.name}">` : ''}
+          ${carouselHTML(ex.imgs, ex.name)}
           <div class="stage">
             <div class="stage-note">Pega neste peso e faz 3 repetições para sentires a carga.</div>
             <div class="bignums">
@@ -780,6 +814,7 @@ function renderCalibration(day, ex){
     app.querySelector('#c-plus').onclick = ()=>{ ex._calibW = +(ex._calibW+step).toFixed(2); app.querySelector('#c-val').textContent = ex._calibW; };
     app.querySelector('#c-skip').onclick = ()=>{ applyCalibratedWeight(ex, ex._calibW); };
     app.querySelector('#c-next').onclick = ()=>{ ex._calibPhase = 'rate'; render(); };
+    wireCarousel();
   } else {
     h(`
       <div class="screen">
@@ -845,7 +880,7 @@ function renderStrengthRunner(day, ex){
           <div class="runner-exname">${ex.name}</div>
           <div class="runner-setlabel">Série ${idx+1} de ${ex.setPlan.length}${isPyramid ? ' · 🔺 pirâmide (peso sobe a cada série)' : ''}</div>
         </div>
-        ${ex.img ? `<img class="exphoto" src="${ex.img}" alt="${ex.name}">` : ''}
+        ${carouselHTML(ex.imgs, ex.name)}
         <div class="setdots">
           ${ex.setPlan.map((s,i)=>`<span class="${i<idx?'done':(i===idx?'current':'')}"></span>`).join('')}
         </div>
@@ -901,6 +936,7 @@ function renderStrengthRunner(day, ex){
     onLeft: ()=> completeSet(day, ex, idx, isLast),
     onRight: ()=>{ if(idx>0){ ex.cursor = idx-1; render(); } }
   });
+  wireCarousel();
 }
 
 function completeSet(day, ex, idx, isLast){
