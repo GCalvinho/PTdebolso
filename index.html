@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101114">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PT de Bolso">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>PT de Bolso</title>
+<style>
+  :root{
+    --bg:#101114;
+    --surface:#1a1c22;
+    --surface-2:#20232a;
+    --text:#edeeef;
+    --muted:#8a8d96;
+    --muted-2:#5c5f68;
+    --accent:#ff5a36;
+    --accent-dim:#7a2e1c;
+    --good:#c6ff3d;
+    --danger:#ff5d5d;
+    --line:rgba(237,238,239,0.08);
+    --radius:18px;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior:none;
+    user-select:none;
+  }
+  input,textarea{user-select:text;}
+  #app{
+    max-width:520px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding-top:var(--safe-top);
+    padding-bottom:var(--safe-bottom);
+  }
+  ::-webkit-scrollbar{display:none;}
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 20px 10px;
+  }
+  .brand{font-weight:800;font-size:17px;letter-spacing:-0.02em;}
+  .brand span{color:var(--accent);}
+  .iconbtn{
+    width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface);border:1px solid var(--line);
+    color:var(--text);font-size:17px;cursor:pointer;
+  }
+  .iconbtn:active{background:var(--surface-2);}
+
+  .screen{flex:1;display:flex;flex-direction:column;padding:0 20px 32px;}
+  .screen.center{justify-content:center;}
+
+  h1{font-size:28px;line-height:1.15;letter-spacing:-0.02em;margin:6px 0 4px;font-weight:800;}
+  h2{font-size:20px;letter-spacing:-0.01em;margin:0 0 4px;font-weight:700;}
+  p.lead{color:var(--muted);font-size:15px;line-height:1.5;margin:0 0 22px;}
+
+  .field{margin-bottom:20px;}
+  .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;}
+  .field input[type=text],.field input[type=number],.field textarea{
+    width:100%;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;padding:14px 14px;color:var(--text);font-size:16px;
+    font-family:inherit;
+  }
+  .field textarea{resize:none;min-height:64px;}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
+
+  .choices{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    padding:10px 16px;border-radius:100px;background:var(--surface);
+    border:1px solid var(--line);color:var(--text);font-size:14px;cursor:pointer;
+  }
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#1a0d08;font-weight:700;}
+
+  .stepper-row{display:flex;align-items:center;justify-content:center;gap:22px;padding:10px 0 4px;}
+  .stepper-btn{
+    width:48px;height:48px;border-radius:50%;background:var(--surface);
+    border:1px solid var(--line);color:var(--text);font-size:22px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  .stepper-val{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;min-width:56px;text-align:center;}
+
+  .toggle-row{display:flex;gap:10px;}
+  .toggle-opt{
+    flex:1;text-align:center;padding:16px;border-radius:14px;background:var(--surface);
+    border:1px solid var(--line);cursor:pointer;font-size:15px;
+  }
+  .toggle-opt.active{background:var(--accent);border-color:var(--accent);color:#1a0d08;font-weight:700;}
+
+  .progressdots{display:flex;gap:6px;margin-bottom:18px;}
+  .progressdots span{height:4px;flex:1;border-radius:2px;background:var(--line);}
+  .progressdots span.on{background:var(--accent);}
+
+  .btnbar{margin-top:auto;display:flex;gap:10px;padding-top:18px;}
+  .btn{
+    flex:1;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:700;
+    cursor:pointer;text-align:center;
+  }
+  .btn.primary{background:var(--accent);color:#1a0d08;}
+  .btn.primary:active{background:#e0491f;}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);}
+  .btn.ghost:active{background:var(--surface);}
+  .btn:disabled{opacity:0.35;pointer-events:none;}
+  .btn.full{width:100%;}
+
+  .daycard{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 4px;border-bottom:1px solid var(--line);cursor:pointer;
+  }
+  .daycard:last-child{border-bottom:none;}
+  .daycard .dl{display:flex;flex-direction:column;gap:4px;}
+  .daycard .dlabel{font-size:16px;font-weight:700;}
+  .daycard .dmeta{font-size:13px;color:var(--muted);}
+  .daycard .dstatus{font-size:22px;color:var(--muted-2);}
+  .daycard .dstatus.done{color:var(--good);}
+  .daycard.today{background:rgba(255,90,54,0.07);border-radius:14px;padding-left:14px;padding-right:14px;margin:0 -14px;}
+
+  .exrow{
+    display:flex;align-items:center;gap:14px;
+    padding:16px 4px;border-bottom:1px solid var(--line);cursor:pointer;
+  }
+  .exrow:last-child{border-bottom:none;}
+  .exrow .badge{
+    width:34px;height:34px;border-radius:50%;background:var(--surface);
+    display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);
+    border:1px solid var(--line);flex-shrink:0;
+  }
+  .exrow.done .badge{background:var(--good);color:#1a2600;border-color:var(--good);}
+  .exrow .exinfo{flex:1;}
+  .exrow .exname{font-size:15px;font-weight:700;}
+  .exrow.done .exname{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted-2);}
+  .exrow .exmeta{font-size:13px;color:var(--muted);margin-top:2px;}
+  .exrow .chev{color:var(--muted-2);font-size:18px;}
+
+  .runner{flex:1;display:flex;flex-direction:column;}
+  .runner-head{padding:6px 0 2px;}
+  .runner-exname{font-size:19px;font-weight:800;margin:0 0 2px;}
+  .runner-setlabel{font-size:13px;color:var(--muted);}
+  .exphoto{width:100%;height:170px;border-radius:16px;object-fit:cover;object-position:center 25%;margin:12px 0 2px;background:var(--surface);display:block;}
+  .exphoto-cap{font-size:11px;color:var(--muted-2);margin-bottom:2px;}
+  .setdots{display:flex;gap:5px;margin:12px 0 4px;}
+  .setdots span{width:8px;height:8px;border-radius:50%;background:var(--line);}
+  .setdots span.done{background:var(--good);}
+  .setdots span.current{background:var(--accent);width:20px;border-radius:4px;}
+
+  .stage{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:var(--surface);border-radius:24px;margin:16px 0;padding:28px 20px;
+    position:relative;overflow:hidden;touch-action:pan-y;
+  }
+  .stage-note{font-size:13px;color:var(--muted);text-align:center;margin-bottom:18px;max-width:280px;}
+  .bignums{display:flex;align-items:center;justify-content:center;gap:26px;width:100%;}
+  .numblock{display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .numctrls{display:flex;align-items:center;gap:14px;}
+  .numval{font-size:clamp(46px,15vw,64px);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;min-width:1.4em;text-align:center;}
+  .numlabel{font-size:12px;color:var(--muted);}
+  .microbtn{
+    width:38px;height:38px;border-radius:50%;background:var(--surface-2);
+    border:1px solid var(--line);color:var(--text);font-size:19px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  .divider-x{width:1px;align-self:stretch;background:var(--line);margin:6px 0;}
+
+  .swipehint{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--muted-2);font-size:12px;margin-top:6px;}
+
+  .rest-overlay{
+    position:absolute;inset:0;background:rgba(16,17,20,0.94);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    border-radius:24px;
+  }
+  .rest-ring{font-size:52px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent);}
+  .rest-lbl{color:var(--muted);font-size:14px;}
+
+  .cardio-timer{font-size:clamp(48px,16vw,68px);font-weight:800;font-variant-numeric:tabular-nums;}
+
+  .celebrate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;}
+  .celebrate .big{font-size:52px;}
+  .statgrid{display:flex;gap:10px;width:100%;margin:22px 0;}
+  .statbox{flex:1;background:var(--surface);border-radius:14px;padding:16px 8px;text-align:center;}
+  .statbox b{display:block;font-size:22px;}
+  .statbox span{font-size:12px;color:var(--muted);}
+
+  .settingsrow{display:flex;align-items:center;justify-content:space-between;padding:16px 4px;border-bottom:1px solid var(--line);}
+  .settingsrow:last-child{border-bottom:none;}
+  .settingsrow .srlabel{font-size:15px;}
+  .settingsrow .srsub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .switch{width:46px;height:28px;border-radius:20px;background:var(--surface-2);border:1px solid var(--line);position:relative;cursor:pointer;flex-shrink:0;}
+  .switch .knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:var(--muted);transition:transform .15s;}
+  .switch.on{background:var(--accent-dim);border-color:var(--accent);}
+  .switch.on .knob{transform:translateX(18px);background:var(--accent);}
+
+  .supp-card{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:12px;}
+  .supp-card h3{margin:0 0 6px;font-size:15px;}
+  .supp-card p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.5;}
+  .supp-tag{display:inline-block;font-size:11px;color:var(--good);border:1px solid var(--good);border-radius:6px;padding:1px 7px;margin-bottom:8px;}
+  .disclaimer{font-size:12px;color:var(--muted-2);line-height:1.5;margin-top:6px;}
+
+  .weekbar{display:flex;gap:4px;margin-top:16px;}
+  .weekbar .wd{flex:1;height:5px;border-radius:3px;background:var(--line);}
+  .weekbar .wd.done{background:var(--good);}
+  .weekbar .wd.today{background:var(--accent);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ====================== EXERCISE DATABASE ====================== */
+const EXO = {
+  peito: [
+    {id:'peito_supino_inc_halt', img:'img/peito_supino_inc_halt.jpg', name:'Supino inclinado com halteres', sets:4, min:8, max:12, rest:90, inc:2, calibStart:8, note:'Banco a 20–30°. O exercício mais importante para o peitoral superior.'},
+    {id:'peito_chest_press', img:'img/peito_chest_press.jpg', name:'Chest press (máquina)', sets:3, min:10, max:12, rest:90, inc:5, calibStart:20, note:'Boa opção para aprenderes o movimento com controlo total.'},
+    {id:'peito_crossover', img:'img/peito_crossover.jpg', name:'Crossover de cabos', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:5, note:'Cruza as mãos no fim do movimento e contrai 1 segundo.'},
+    {id:'peito_pec_deck', img:'img/peito_pec_deck.jpg', name:'Pec deck', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:'Amplitude controlada — não precisas de peso elevado.'},
+    {id:'peito_crossover_baixo', img:'img/peito_crossover_baixo.jpg', name:'Crossover baixo → alto', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:5, note:'Ênfase extra na parte superior do peito.'},
+    {id:'peito_supino_plano', img:'img/peito_supino_plano.jpg', name:'Supino plano (máquina/Smith)', sets:3, min:8, max:12, rest:90, inc:2.5, calibStart:20, note:'Constrói massa geral no peitoral.'}
+  ],
+  costas: [
+    {id:'costas_pulldown', img:'img/costas_pulldown.jpg', name:'Puxada ao peito (lat pulldown)', sets:4, min:8, max:12, rest:90, inc:2.5, calibStart:20, note:'Leva os cotovelos para baixo — não puxes só com as mãos.'},
+    {id:'costas_remada_sent', img:'img/costas_remada_sent.jpg', name:'Remada sentada (máquina/cabo)', sets:3, min:10, max:12, rest:90, inc:2.5, calibStart:20, note:''},
+    {id:'costas_remada_uni', img:'img/costas_remada_uni.jpg', name:'Remada unilateral com haltere', sets:3, min:10, max:10, rest:75, inc:1, calibStart:8, note:'Cada lado.'},
+    {id:'costas_pulldown_est', img:'img/costas_pulldown_est.jpg', name:'Pulldown de braços estendidos', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:10, note:'Ótimo para aprenderes a sentir os dorsais.'},
+    {id:'costas_pullover', img:'img/costas_pullover.jpg', name:'Pullover (máquina/cabo)', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:10, note:''}
+  ],
+  pernas: [
+    {id:'pernas_legpress', img:'img/pernas_legpress.jpg', name:'Leg press', sets:4, min:10, max:12, rest:90, inc:5, calibStart:40, note:''},
+    {id:'pernas_rdl', img:'img/pernas_rdl.jpg', name:'Levantamento romeno com halteres', sets:3, min:8, max:12, rest:90, inc:2, calibStart:8, note:'Começa leve para dominares a técnica — foca nos posteriores da coxa.'},
+    {id:'pernas_extensao', img:'img/pernas_extensao.jpg', name:'Extensão de pernas', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
+    {id:'pernas_flexao', img:'img/pernas_flexao.jpg', name:'Flexão de pernas (leg curl)', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
+    {id:'pernas_gemeos', img:'img/pernas_gemeos.jpg', name:'Elevação de gémeos', sets:4, min:12, max:15, rest:60, inc:5, calibStart:20, note:''}
+  ],
+  ombros: [
+    {id:'ombros_elev_lat', img:'img/ombros_elev_lat.jpg', name:'Elevação lateral', sets:4, min:12, max:15, rest:60, inc:1, calibStart:3, note:'Prioriza técnica limpa sobre peso alto — sem balanço do corpo.'},
+    {id:'ombros_facepull', img:'img/ombros_facepull.jpg', name:'Face pull', sets:3, min:12, max:15, rest:60, inc:1.25, calibStart:8, note:'Importante para a saúde e mobilidade dos ombros.'},
+    {id:'ombros_reverse_deck', img:'img/ombros_reverse_deck.jpg', name:'Reverse pec deck', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:10, note:'Deltoide posterior.'},
+    {id:'ombros_desenv', img:'img/ombros_desenv.jpg', name:'Desenvolvimento de ombros (máquina)', sets:3, min:8, max:12, rest:90, inc:2.5, calibStart:10, note:''}
+  ],
+  biceps: [
+    {id:'biceps_direta', img:'img/biceps_direta.jpg', name:'Rosca direta com halteres', sets:3, min:10, max:12, rest:60, inc:1, calibStart:5, note:''},
+    {id:'biceps_martelo', img:'img/biceps_martelo.jpg', name:'Rosca martelo', sets:3, min:10, max:12, rest:60, inc:1, calibStart:5, note:''}
+  ],
+  triceps: [
+    {id:'triceps_corda', img:'img/triceps_corda.jpg', name:'Tríceps na polia com corda', sets:3, min:10, max:15, rest:60, inc:1.25, calibStart:10, note:''},
+    {id:'triceps_acima', img:'img/triceps_acima.jpg', name:'Tríceps acima da cabeça com corda', sets:3, min:10, max:15, rest:60, inc:1.25, calibStart:7.5, note:''}
+  ],
+  abdominais: [
+    {id:'abs_prancha', img:'img/abs_prancha.jpg', name:'Prancha (plank)', sets:3, min:30, max:60, rest:45, unit:'seg', bodyweight:true, note:''},
+    {id:'abs_joelhos', img:'img/abs_joelhos.jpg', name:'Elevação de joelhos suspenso', sets:3, min:10, max:15, rest:60, bodyweight:true, note:''},
+    {id:'abs_cablecrunch', img:'img/abs_cablecrunch.jpg', name:'Crunch na polia', sets:3, min:12, max:15, rest:60, inc:2.5, calibStart:15, note:''},
+    {id:'abs_deadbug', img:'img/abs_deadbug.jpg', name:'Dead bug', sets:3, min:8, max:12, rest:45, bodyweight:true, note:'Cada lado.'},
+    {id:'abs_pallof', img:'img/abs_pallof.jpg', name:'Pallof press', sets:3, min:10, max:12, rest:45, inc:1.25, calibStart:8, note:'Cada lado.'}
+  ],
+  cardio: [
+    {id:'cardio_continuo', name:'Cardio contínuo', minutes:25, note:'Ritmo moderado — dá para falar, mas não cantar.'},
+    {id:'cardio_caminhada', name:'Caminhada inclinada', minutes:12, note:'Ideal a fechar um treino de musculação.'},
+    {id:'cardio_intervalado', name:'Intervalado', minutes:15, note:'5 ciclos: 1 min rápido + 2 min lento.'}
+  ]
+};
+
+const TEMPLATES = {
+  1: [{label:'Corpo inteiro', groups:['peito','costas','pernas','ombros','abdominais']}],
+  2: [{label:'Superior', groups:['peito','costas','ombros','triceps','biceps']},
+      {label:'Inferior + Core', groups:['pernas','abdominais']}],
+  3: [{label:'Push — Peito, Ombros, Tríceps', groups:['peito','ombros','triceps']},
+      {label:'Pull — Costas e Bíceps', groups:['costas','biceps']},
+      {label:'Pernas + Core', groups:['pernas','abdominais']}],
+  4: [{label:'Peito + Tríceps', groups:['peito','triceps']},
+      {label:'Costas + Bíceps', groups:['costas','biceps']},
+      {label:'Pernas + Core', groups:['pernas','abdominais']},
+      {label:'Ombros + Core', groups:['ombros','abdominais']}],
+  5: [{label:'Peito + Tríceps', groups:['peito','triceps']},
+      {label:'Costas + Bíceps', groups:['costas','biceps']},
+      {label:'Pernas + Core', groups:['pernas','abdominais']},
+      {label:'Ombros + Braços', groups:['ombros','biceps','triceps']},
+      {label:'Cardio + Abdominais', groups:['cardio','abdominais']}],
+  6: [{label:'Peito + Tríceps', groups:['peito','triceps']},
+      {label:'Costas + Bíceps', groups:['costas','biceps']},
+      {label:'Pernas + Core', groups:['pernas','abdominais']},
+      {label:'Ombros + Core', groups:['ombros','abdominais']},
+      {label:'Peito + Ombros', groups:['peito','ombros']},
+      {label:'Costas + Braços', groups:['costas','biceps','triceps']}],
+  7: [{label:'Peito + Tríceps', groups:['peito','triceps']},
+      {label:'Costas + Bíceps', groups:['costas','biceps']},
+      {label:'Pernas + Core', groups:['pernas','abdominais']},
+      {label:'Cardio + Abdominais', groups:['cardio','abdominais']},
+      {label:'Peito + Ombros', groups:['peito','ombros']},
+      {label:'Costas + Braços', groups:['costas','biceps','triceps']},
+      {label:'Cardio + Core', groups:['cardio','abdominais']}]
+};
+
+const COUNT_PER_GROUP = {peito:3, costas:3, pernas:4, ombros:2, biceps:2, triceps:2, abdominais:3, cardio:1};
+const GROUP_ICON = {peito:'💪', costas:'🔙', pernas:'🦵', ombros:'🎯', biceps:'💪', triceps:'💪', abdominais:'🔥', cardio:'🏃'};
+const FOCUS_OPTIONS = [
+  {k:'peito', l:'Peito'}, {k:'costas', l:'Costas'}, {k:'pernas', l:'Pernas'},
+  {k:'ombros', l:'Ombros'}, {k:'bracos', l:'Braços'}, {k:'abdominais', l:'Abdominais'}
+];
+
+/* ====================== STORAGE ====================== */
+const STORE_KEY = 'ptb_v1';
+function loadStore(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return {}; }
+}
+function saveStore(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+let DB = loadStore();
+DB.logs = DB.logs || {};
+function persist(){ saveStore(DB); }
+
+/* ====================== PLAN GENERATION ====================== */
+function pickCardio(idx){
+  const arr = EXO.cardio;
+  return arr[idx % arr.length];
+}
+function stepForInc(inc){ return inc>=2 ? 2.5 : (inc>=1 ? 1 : 0.5); }
+function roundToStep(v, step){ return Math.round(v/step)*step; }
+
+function schemeForObjective(){
+  return (DB.profile && DB.profile.objetivo === 'massa') ? 'piramide' : 'reta';
+}
+function objectiveSchemeNote(obj){
+  if (obj === 'massa') return '🔺 Séries em pirâmide: o peso sobe e as repetições descem a cada série — a última é a mais pesada. Ideal para força e hipertrofia.';
+  if (obj === 'emagrecer') return '➖ Séries retas: mesmo peso e mesmas repetições em todas as séries, para manteres o ritmo e a técnica.';
+  if (obj === 'ambos') return '➖ Séries retas: mesmo peso em todas as séries — prioriza técnica e consistência enquanto combinas perda de gordura com ganho de músculo.';
+  return '';
+}
+
+// Builds the per-set targets for one exercise. "weight" is the exercise's
+// reference/working weight (the heaviest set, for pyramid schemes).
+function computeSetPlan(ex, sets, weight){
+  const usesPyramid = !ex.bodyweight && ex.unit !== 'seg' && schemeForObjective() === 'piramide';
+  const step = stepForInc(ex.inc || 2.5);
+  const arr = [];
+  let prevW = null;
+  for (let i=0; i<sets; i++){
+    let reps = ex.max;
+    let w = weight;
+    if (usesPyramid && sets > 1){
+      reps = Math.round(ex.max - i*(ex.max-ex.min)/(sets-1));
+      reps = Math.max(ex.min, Math.min(ex.max, reps));
+      if (weight != null){
+        const frac = 0.72 + 0.28 * (i/(sets-1)); // ramps from ~72% up to 100% of the working weight
+        w = roundToStep(weight*frac, step);
+        if (prevW != null && w < prevW) w = prevW;
+      }
+    }
+    if (w != null) prevW = w;
+    arr.push({reps, weight: w, doneReps:null, doneWeight:null});
+  }
+  return arr;
+}
+
+function buildExerciseInstance(def, group, isFocus){
+  const log = DB.logs[def.id];
+  const sets = def.sets + (DB.profile.nivel === 'avancado' ? 1 : 0);
+  const lastWeight = log && log.lastWeight != null ? log.lastWeight : null;
+  const ex = {
+    id: def.id, name: def.name, group, isFocus: !!isFocus,
+    unit: def.unit || 'reps', bodyweight: !!def.bodyweight, img: def.img || null,
+    min: def.min, max: def.max, rest: def.rest, note: def.note || '', inc: def.inc || 2.5,
+    calibStart: def.calibStart || 5,
+    done: false, cursor: 0
+  };
+  ex.setPlan = computeSetPlan(ex, sets, lastWeight);
+  return ex;
+}
+function buildDay(template, cardioCounterRef, profile){
+  const focusSet = new Set(profile.foco.includes('bracos') ? [...profile.foco, 'biceps','triceps'] : profile.foco);
+  let list = [];
+  template.groups.forEach(g => {
+    if (g === 'cardio'){
+      const c = pickCardio(cardioCounterRef.i++);
+      let minutes = c.minutes;
+      if (profile.objetivo !== 'massa' && c.id === 'cardio_continuo') minutes += 5;
+      list.push({id:c.id+'_'+template.label, baseId:c.id, name:c.name, group:'cardio', type:'cardio', minutes, note:c.note, done:false});
+      return;
+    }
+    const bank = EXO[g];
+    const isFocus = focusSet.has(g);
+    let count = COUNT_PER_GROUP[g] || 2;
+    if (isFocus) count = Math.min(bank.length, count + 1);
+    bank.slice(0, count).forEach(def => list.push(buildExerciseInstance(def, g, isFocus)));
+  });
+  // focus groups float to the top, keep relative order otherwise
+  list = list.map((x,i)=>({x,i})).sort((a,b)=> (b.x.isFocus - a.x.isFocus) || (a.i-b.i)).map(p=>p.x);
+  // fat-loss finisher: short cardio at the end of pure-strength days
+  const hasCardio = template.groups.includes('cardio');
+  if (!hasCardio && profile.objetivo !== 'massa'){
+    const c = EXO.cardio.find(c=>c.id==='cardio_caminhada');
+    list.push({id:'finisher_'+template.label, baseId:c.id, name:c.name, group:'cardio', type:'cardio', minutes:c.minutes, note:'Finisher para maximizar a queima de gordura.', done:false, finisher:true});
+  }
+  return list;
+}
+function generatePlan(profile){
+  const templates = TEMPLATES[profile.dias];
+  const cardioCounterRef = {i:0};
+  const days = templates.map((t, idx) => ({
+    dayId: 'd'+idx,
+    label: t.label,
+    groups: t.groups,
+    icons: t.groups.map(g=>GROUP_ICON[g]).join(' '),
+    exercises: buildDay(t, cardioCounterRef, profile)
+  }));
+  return {generatedAt: new Date().toISOString(), days};
+}
+
+/* ====================== APP STATE ====================== */
+let view = DB.profile && DB.plan ? 'dashboard' : 'onboarding';
+let ob = {step:0, data:{altura:'', peso:'', objetivo:null, nivel:null, dias:null, foco:[], suplementos:null, limitacoes:''}};
+let activeDayId = null;
+let activeExIndex = 0;
+let settingsDraft = null;
+let settingsField = null;
+let supplementsFrom = 'dashboard';
+let restTimer = null, restRemaining = 0;
+let cardioTimer = null, cardioRemaining = 0, cardioRunning = false;
+let sessionDate = new Date().toDateString();
+
+function todaysCompletion(){
+  DB.completion = DB.completion || {};
+  DB.completion[sessionDate] = DB.completion[sessionDate] || {};
+  return DB.completion[sessionDate];
+}
+
+/* ====================== RENDER HELPERS ====================== */
+const app = document.getElementById('app');
+function h(html){ app.innerHTML = html; }
+function on(sel, evt, fn){ app.querySelectorAll(sel).forEach(el => el.addEventListener(evt, fn)); }
+
+function topbar(title, opts){
+  opts = opts || {};
+  return `<div class="topbar">
+    <div class="brand">PT <span>de bolso</span></div>
+    ${opts.settings ? '<div class="iconbtn" id="btn-settings">⚙️</div>' : '<div style="width:38px"></div>'}
+  </div>`;
+}
+
+/* ====================== ONBOARDING ====================== */
+const OB_STEPS = 7;
+function renderOnboarding(){
+  const s = ob.step;
+  const d = ob.data;
+  let body = '';
+  let canNext = true;
+
+  if (s === 0){
+    body = `
+      <h1>Vamos montar o teu plano.</h1>
+      <p class="lead">Responde a algumas perguntas rápidas — o treino é gerado à tua medida.</p>
+      <div class="field"><label>Altura (cm)</label><input type="number" inputmode="numeric" id="in-altura" placeholder="ex: 175" value="${d.altura}"></div>
+      <div class="field"><label>Peso (kg)</label><input type="number" inputmode="decimal" id="in-peso" placeholder="ex: 78" value="${d.peso}"></div>
+    `;
+    canNext = d.altura && d.peso;
+  } else if (s === 1){
+    body = `
+      <h1>Qual é o teu objetivo?</h1>
+      <p class="lead">Isto define o equilíbrio entre musculação e cardio no teu plano.</p>
+      <div class="choices">
+        ${opt('objetivo','emagrecer','Emagrecer')}
+        ${opt('objetivo','massa','Ganhar massa muscular')}
+        ${opt('objetivo','ambos','Ambos (recomposição)')}
+      </div>
+      ${d.objetivo ? `<p class="lead" style="margin-top:14px;margin-bottom:0;font-size:13.5px;">${objectiveSchemeNote(d.objetivo)}</p>` : ''}`;
+    canNext = !!d.objetivo;
+  } else if (s === 2){
+    body = `
+      <h1>Qual é o teu nível?</h1>
+      <p class="lead">Ajusta o volume e a exigência de cada treino.</p>
+      <div class="choices">
+        ${opt('nivel','iniciante','Iniciante')}
+        ${opt('nivel','intermedio','Intermédio')}
+        ${opt('nivel','avancado','Avançado')}
+      </div>`;
+    canNext = !!d.nivel;
+  } else if (s === 3){
+    body = `
+      <h1>Quantos dias por semana?</h1>
+      <p class="lead">Vais treinar quantos dias no ginásio?</p>
+      <div class="stepper-row">
+        <div class="stepper-btn" id="dias-menos">−</div>
+        <div class="stepper-val">${d.dias || 3}</div>
+        <div class="stepper-btn" id="dias-mais">+</div>
+      </div>`;
+    if (!d.dias) d.dias = 3;
+    canNext = true;
+  } else if (s === 4){
+    body = `
+      <h1>Alguma prioridade?</h1>
+      <p class="lead">Escolhe zonas em que queres dar ênfase extra (opcional).</p>
+      <div class="choices">
+        ${FOCUS_OPTIONS.map(f => `<div class="chip ${d.foco.includes(f.k)?'active':''}" data-foco="${f.k}">${f.l}</div>`).join('')}
+      </div>`;
+    canNext = true;
+  } else if (s === 5){
+    body = `
+      <h1>Queres dicas de suplementação?</h1>
+      <p class="lead">Informação geral (creatina, proteína, cafeína) para combinar com o treino. Não substitui aconselhamento médico.</p>
+      <div class="toggle-row">
+        <div class="toggle-opt ${d.suplementos===true?'active':''}" data-supl="1">Sim</div>
+        <div class="toggle-opt ${d.suplementos===false?'active':''}" data-supl="0">Não</div>
+      </div>`;
+    canNext = d.suplementos !== null;
+  } else if (s === 6){
+    body = `
+      <h1>Alguma limitação?</h1>
+      <p class="lead">Lesões, dores ou restrições que devamos ter em conta (opcional).</p>
+      <div class="field"><textarea id="in-limit" placeholder="ex: dor no joelho direito">${d.limitacoes}</textarea></div>
+    `;
+    canNext = true;
+  }
+
+  h(`
+    <div class="screen">
+      <div class="topbar"><div class="brand">PT <span>de bolso</span></div><div style="width:38px"></div></div>
+      <div class="progressdots">${Array.from({length:OB_STEPS},(_,i)=>`<span class="${i<=s?'on':''}"></span>`).join('')}</div>
+      ${body}
+      <div class="btnbar">
+        ${s>0 ? '<button class="btn ghost" id="ob-back">Voltar</button>' : ''}
+        <button class="btn primary" id="ob-next" ${canNext?'':'disabled'}>${s===OB_STEPS-1?'Criar o meu plano':'Continuar'}</button>
+      </div>
+    </div>
+  `);
+
+  function opt(key,val,label){
+    return `<div class="chip ${d[key]===val?'active':''}" data-optkey="${key}" data-optval="${val}">${label}</div>`;
+  }
+
+  if (s===0){
+    app.querySelector('#in-altura').oninput = e => { d.altura = e.target.value; syncNext(); };
+    app.querySelector('#in-peso').oninput = e => { d.peso = e.target.value; syncNext(); };
+  }
+  on('.chip[data-optkey]','click', e=>{
+    d[e.target.dataset.optkey] = e.target.dataset.optval;
+    renderOnboarding();
+  });
+  on('.chip[data-foco]','click', e=>{
+    const k = e.target.dataset.foco;
+    const i = d.foco.indexOf(k);
+    if (i>-1) d.foco.splice(i,1); else d.foco.push(k);
+    renderOnboarding();
+  });
+  on('.toggle-opt[data-supl]','click', e=>{
+    d.suplementos = e.target.dataset.supl === '1';
+    renderOnboarding();
+  });
+  if (s===3){
+    app.querySelector('#dias-menos').onclick = ()=>{ d.dias=Math.max(1,(d.dias||3)-1); renderOnboarding(); };
+    app.querySelector('#dias-mais').onclick = ()=>{ d.dias=Math.min(7,(d.dias||3)+1); renderOnboarding(); };
+  }
+  if (s===6){
+    app.querySelector('#in-limit').oninput = e => d.limitacoes = e.target.value;
+  }
+  const backBtn = app.querySelector('#ob-back');
+  if (backBtn) backBtn.onclick = ()=>{ ob.step--; renderOnboarding(); };
+  app.querySelector('#ob-next').onclick = ()=>{
+    if (s < OB_STEPS-1){ ob.step++; renderOnboarding(); }
+    else finishOnboarding();
+  };
+
+  function syncNext(){
+    const btn = app.querySelector('#ob-next');
+    if (btn) btn.disabled = !(d.altura && d.peso);
+  }
+}
+function finishOnboarding(){
+  DB.profile = {...ob.data, createdAt: new Date().toISOString()};
+  DB.plan = generatePlan(DB.profile);
+  DB.completion = {};
+  persist();
+  view = 'dashboard';
+  render();
+}
+
+/* ====================== DASHBOARD ====================== */
+function exSummaryLine(ex){
+  if (ex.type === 'cardio') return `${ex.minutes} min · cardio`;
+  const unitL = ex.unit === 'seg' ? 'seg' : 'reps';
+  const isPyramid = !ex.bodyweight && ex.unit !== 'seg' && schemeForObjective() === 'piramide' && ex.setPlan.length > 1;
+  if (isPyramid){
+    const w0 = ex.setPlan[0].weight, wN = ex.setPlan[ex.setPlan.length-1].weight;
+    const wl = (w0!=null && wN!=null) ? `${w0}→${wN} kg` : 'definir peso';
+    return `${ex.setPlan.length}× pirâmide ${ex.min}-${ex.max} ${unitL} · ${wl}`;
+  }
+  const w = ex.setPlan[0].weight;
+  const wl = ex.bodyweight ? 'peso do corpo' : (w!=null ? w+' kg' : 'definir peso');
+  return `${ex.setPlan.length}× ${ex.min}-${ex.max} ${unitL} · ${wl}`;
+}
+function dayProgress(day){
+  const comp = todaysCompletion();
+  const total = day.exercises.length;
+  const done = day.exercises.filter(ex => comp[day.dayId+'_'+ex.id]).length;
+  return {done, total};
+}
+function renderDashboard(){
+  const p = DB.profile;
+  const rows = DB.plan.days.map((day,i) => {
+    const {done,total} = dayProgress(day);
+    const isDoneAll = total>0 && done===total;
+    return `<div class="daycard" data-day="${day.dayId}">
+      <div class="dl">
+        <div class="dlabel">Dia ${i+1} · ${day.label}</div>
+        <div class="dmeta">${day.exercises.length} exercícios ${done>0?`· ${done}/${total} feitos`:''}</div>
+      </div>
+      <div class="dstatus ${isDoneAll?'done':''}">${isDoneAll?'✓':'›'}</div>
+    </div>`;
+  }).join('');
+
+  const objLabel = {emagrecer:'Emagrecer', massa:'Ganhar massa', ambos:'Recomposição corporal'}[p.objetivo];
+
+  h(`
+    <div class="screen">
+      ${topbar('', {settings:true})}
+      <h1 style="margin-top:8px;">O teu plano</h1>
+      <p class="lead">${objLabel} · ${p.dias}×/semana · nível ${p.nivel}</p>
+      <div>${rows}</div>
+      ${p.suplementos ? `<div class="btnbar" style="margin-top:24px;"><button class="btn ghost full" id="go-supl">Ver dicas de suplementação</button></div>` : ''}
+    </div>
+  `);
+  app.querySelector('#btn-settings').onclick = ()=>{ view='settings'; render(); };
+  on('.daycard','click', e=>{
+    activeDayId = e.currentTarget.dataset.day;
+    view = 'day';
+    render();
+  });
+  const gs = app.querySelector('#go-supl');
+  if (gs) gs.onclick = ()=>{ supplementsFrom='dashboard'; view='supplements'; render(); };
+}
+
+/* ====================== DAY DETAIL ====================== */
+function renderDay(){
+  const day = DB.plan.days.find(d=>d.dayId===activeDayId);
+  const idx = DB.plan.days.findIndex(d=>d.dayId===activeDayId);
+  const comp = todaysCompletion();
+  const rows = day.exercises.map((ex,i) => {
+    const key = day.dayId+'_'+ex.id;
+    const isDone = !!comp[key];
+    return `<div class="exrow ${isDone?'done':''}" data-idx="${i}">
+      <div class="badge">${isDone?'✓':(i+1)}</div>
+      <div class="exinfo">
+        <div class="exname">${ex.name}</div>
+        <div class="exmeta">${exSummaryLine(ex)}</div>
+      </div>
+      <div class="chev">›</div>
+    </div>`;
+  }).join('');
+  const {done,total} = dayProgress(day);
+
+  h(`
+    <div class="screen">
+      <div class="topbar">
+        <div class="iconbtn" id="btn-back">←</div>
+        <div class="brand">Dia ${idx+1}</div>
+        <div style="width:38px"></div>
+      </div>
+      <h1 style="margin-top:8px;font-size:22px;">${day.label}</h1>
+      <p class="lead" style="margin-bottom:14px;">${done}/${total} exercícios concluídos hoje</p>
+      <div>${rows}</div>
+    </div>
+  `);
+  app.querySelector('#btn-back').onclick = ()=>{ view='dashboard'; render(); };
+  on('.exrow','click', e=>{
+    activeExIndex = parseInt(e.currentTarget.dataset.idx,10);
+    view='runner';
+    render();
+  });
+}
+
+/* ====================== RUNNER ====================== */
+function currentDay(){ return DB.plan.days.find(d=>d.dayId===activeDayId); }
+
+function markExerciseDone(ex){
+  const key = activeDayId+'_'+ex.id;
+  todaysCompletion()[key] = true;
+  ex.done = true;
+  persist();
+}
+
+function finishStrengthExercise(ex){
+  // 2-for-2 rule (NSCA/ACSM): only raise the weight after hitting the top of the
+  // rep range on every set for 2 sessions in a row.
+  const allTop = ex.setPlan.every(sp => sp.doneReps != null && sp.doneReps >= sp.reps);
+  const lastSet = ex.setPlan[ex.setPlan.length-1];
+  const usedWeight = lastSet.doneWeight != null ? lastSet.doneWeight : lastSet.weight;
+  DB.logs[ex.id] = DB.logs[ex.id] || {history:[], topStreak:0};
+  const log = DB.logs[ex.id];
+  log.history.push({date:new Date().toISOString(), sets: ex.setPlan.map(sp=>({reps:sp.doneReps ?? sp.reps, weight:sp.doneWeight ?? sp.weight}))});
+  let leveledTo = null;
+  if (usedWeight != null){
+    log.topStreak = allTop ? (log.topStreak||0)+1 : 0;
+    if (log.topStreak >= 2){
+      leveledTo = +(usedWeight + ex.inc).toFixed(2);
+      log.lastWeight = leveledTo;
+      log.topStreak = 0;
+    } else {
+      log.lastWeight = usedWeight;
+    }
+  }
+  markExerciseDone(ex);
+  return leveledTo;
+}
+
+function goToNextExerciseOrSummary(){
+  const day = currentDay();
+  const remaining = day.exercises.findIndex((ex,i) => i>activeExIndex && !ex.done);
+  if (remaining>-1){ activeExIndex = remaining; render(); }
+  else {
+    const allDone = day.exercises.every(ex=>ex.done);
+    if (allDone){ view='daySummary'; render(); }
+    else { view='day'; render(); }
+  }
+}
+
+function needsCalibration(ex){
+  return !ex.bodyweight && (ex.setPlan[0].weight == null);
+}
+
+function renderRunner(){
+  const day = currentDay();
+  const ex = day.exercises[activeExIndex];
+  if (ex.type === 'cardio') return renderCardioRunner(day, ex);
+  if (needsCalibration(ex)) return renderCalibration(day, ex);
+  return renderStrengthRunner(day, ex);
+}
+
+function renderCalibration(day, ex){
+  if (ex._calibW == null) ex._calibW = ex.calibStart;
+  const phase = ex._calibPhase || 'test';
+  const step = ex.inc >= 2 ? 2.5 : (ex.inc >= 1 ? 1 : 0.5);
+
+  if (phase === 'test'){
+    h(`
+      <div class="screen">
+        <div class="topbar">
+          <div class="iconbtn" id="btn-exit">←</div>
+          <div class="brand">Calibrar peso</div>
+          <div style="width:38px"></div>
+        </div>
+        <div class="runner">
+          <div class="runner-head">
+            <div class="runner-exname">${ex.name}</div>
+            <div class="runner-setlabel">Ainda não sabemos o teu peso ideal para este exercício.</div>
+          </div>
+          ${ex.img ? `<img class="exphoto" src="${ex.img}" alt="${ex.name}">` : ''}
+          <div class="stage">
+            <div class="stage-note">Pega neste peso e faz 3 repetições para sentires a carga.</div>
+            <div class="bignums">
+              <div class="numblock">
+                <div class="numctrls">
+                  <div class="microbtn" id="c-minus">−</div>
+                  <div class="numval" id="c-val">${ex._calibW}</div>
+                  <div class="microbtn" id="c-plus">+</div>
+                </div>
+                <div class="numlabel">kg · 3 reps de teste</div>
+              </div>
+            </div>
+          </div>
+          <div class="btnbar">
+            <button class="btn ghost" id="c-skip">Já sei o peso, usar este</button>
+            <button class="btn primary" id="c-next">Já fiz as 3 reps →</button>
+          </div>
+        </div>
+      </div>
+    `);
+    app.querySelector('#btn-exit').onclick = ()=>{ ex._calibPhase=null; ex._calibW=null; view='day'; render(); };
+    app.querySelector('#c-minus').onclick = ()=>{ ex._calibW = Math.max(step, +(ex._calibW-step).toFixed(2)); app.querySelector('#c-val').textContent = ex._calibW; };
+    app.querySelector('#c-plus').onclick = ()=>{ ex._calibW = +(ex._calibW+step).toFixed(2); app.querySelector('#c-val').textContent = ex._calibW; };
+    app.querySelector('#c-skip').onclick = ()=>{ applyCalibratedWeight(ex, ex._calibW); };
+    app.querySelector('#c-next').onclick = ()=>{ ex._calibPhase = 'rate'; render(); };
+  } else {
+    h(`
+      <div class="screen">
+        <div class="topbar">
+          <div class="iconbtn" id="btn-exit">←</div>
+          <div class="brand">Calibrar peso</div>
+          <div style="width:38px"></div>
+        </div>
+        <div class="runner">
+          <div class="runner-head">
+            <div class="runner-exname">Como sentiste os ${ex._calibW} kg?</div>
+            <div class="runner-setlabel">3 repetições de teste em ${ex.name}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
+            <div class="toggle-opt" id="rate-facil" style="text-align:left;padding:18px;">😌 &nbsp; <b>Fácil</b> — dava para fazer muitas mais</div>
+            <div class="toggle-opt" id="rate-medio" style="text-align:left;padding:18px;">😐 &nbsp; <b>Médio</b> — esforço moderado</div>
+            <div class="toggle-opt" id="rate-dificil" style="text-align:left;padding:18px;">😰 &nbsp; <b>Desafiante</b> — já custou terminar</div>
+          </div>
+        </div>
+      </div>
+    `);
+    app.querySelector('#btn-exit').onclick = ()=>{ ex._calibPhase='test'; render(); };
+    app.querySelector('#rate-facil').onclick = ()=> finalizeCalibration(ex, 'facil', step);
+    app.querySelector('#rate-medio').onclick = ()=> finalizeCalibration(ex, 'medio', step);
+    app.querySelector('#rate-dificil').onclick = ()=> finalizeCalibration(ex, 'dificil', step);
+  }
+}
+
+function finalizeCalibration(ex, level, step){
+  const mult = {facil:1.5, medio:1.15, dificil:0.85}[level];
+  let w = ex._calibW * mult;
+  w = Math.round(w/step)*step;
+  if (w <= 0) w = step;
+  applyCalibratedWeight(ex, +w.toFixed(2));
+}
+
+function applyCalibratedWeight(ex, weight){
+  ex.setPlan = computeSetPlan(ex, ex.setPlan.length, weight);
+  DB.logs[ex.id] = DB.logs[ex.id] || {history:[], topStreak:0};
+  DB.logs[ex.id].lastWeight = weight;
+  persist();
+  ex._calibPhase = null;
+  ex._calibW = null;
+  render();
+}
+
+function renderStrengthRunner(day, ex){
+  const idx = ex.cursor;
+  const sp = ex.setPlan[idx];
+  const isLast = idx === ex.setPlan.length-1;
+  const unitLabel = ex.unit === 'seg' ? 'segundos' : 'repetições';
+  const isPyramid = !ex.bodyweight && ex.unit !== 'seg' && schemeForObjective() === 'piramide' && ex.setPlan.length > 1;
+
+  h(`
+    <div class="screen">
+      <div class="topbar">
+        <div class="iconbtn" id="btn-exit">←</div>
+        <div class="brand">${day.label}</div>
+        <div style="width:38px"></div>
+      </div>
+      <div class="runner">
+        <div class="runner-head">
+          <div class="runner-exname">${ex.name}</div>
+          <div class="runner-setlabel">Série ${idx+1} de ${ex.setPlan.length}${isPyramid ? ' · 🔺 pirâmide (peso sobe a cada série)' : ''}</div>
+        </div>
+        ${ex.img ? `<img class="exphoto" src="${ex.img}" alt="${ex.name}">` : ''}
+        <div class="setdots">
+          ${ex.setPlan.map((s,i)=>`<span class="${i<idx?'done':(i===idx?'current':'')}"></span>`).join('')}
+        </div>
+        <div class="stage" id="stage">
+          ${ex.note ? `<div class="stage-note">${ex.note}</div>` : ''}
+          <div class="bignums">
+            <div class="numblock">
+              <div class="numctrls">
+                <div class="microbtn" id="reps-minus">−</div>
+                <div class="numval" id="reps-val">${sp.reps}</div>
+                <div class="microbtn" id="reps-plus">+</div>
+              </div>
+              <div class="numlabel">${unitLabel}</div>
+            </div>
+            ${!ex.bodyweight ? `
+            <div class="divider-x"></div>
+            <div class="numblock">
+              <div class="numctrls">
+                <div class="microbtn" id="w-minus">−</div>
+                <div class="numval" id="w-val">${sp.weight ?? '—'}</div>
+                <div class="microbtn" id="w-plus">+</div>
+              </div>
+              <div class="numlabel">kg · <span id="w-recalib" style="text-decoration:underline;cursor:pointer;">recalibrar</span></div>
+            </div>` : ''}
+          </div>
+          <div id="rest-holder"></div>
+        </div>
+        <div class="swipehint">⟵ arrasta para a esquerda quando terminares a série</div>
+        <div class="btnbar">
+          ${idx>0 ? '<button class="btn ghost" id="set-back">Série anterior</button>' : '<div style="flex:1"></div>'}
+          <button class="btn primary" id="set-done">${isLast ? 'Concluir exercício' : 'Série feita ✓'}</button>
+        </div>
+      </div>
+    </div>
+  `);
+
+  app.querySelector('#btn-exit').onclick = ()=>{ view='day'; render(); };
+  const repsInc = ex.unit==='seg' ? 5 : 1;
+  app.querySelector('#reps-minus').onclick = ()=>{ sp.reps = Math.max(1, sp.reps-repsInc); app.querySelector('#reps-val').textContent = sp.reps; };
+  app.querySelector('#reps-plus').onclick = ()=>{ sp.reps = sp.reps+repsInc; app.querySelector('#reps-val').textContent = sp.reps; };
+  const wMinus = app.querySelector('#w-minus'), wPlus = app.querySelector('#w-plus');
+  if (wMinus){
+    wMinus.onclick = ()=>{ sp.weight = +(((sp.weight||0) - ex.inc).toFixed(2)); if(sp.weight<0)sp.weight=0; app.querySelector('#w-val').textContent = sp.weight; };
+    wPlus.onclick = ()=>{ sp.weight = +(((sp.weight||0) + ex.inc).toFixed(2)); app.querySelector('#w-val').textContent = sp.weight; };
+  }
+  const recalib = app.querySelector('#w-recalib');
+  if (recalib) recalib.onclick = ()=>{ ex.setPlan.forEach(s=>s.weight=null); ex._calibPhase=null; ex._calibW=null; render(); };
+  const backBtn = app.querySelector('#set-back');
+  if (backBtn) backBtn.onclick = ()=>{ ex.cursor = Math.max(0, idx-1); render(); };
+  app.querySelector('#set-done').onclick = ()=> completeSet(day, ex, idx, isLast);
+
+  attachSwipe(app.querySelector('#stage'), {
+    onLeft: ()=> completeSet(day, ex, idx, isLast),
+    onRight: ()=>{ if(idx>0){ ex.cursor = idx-1; render(); } }
+  });
+}
+
+function completeSet(day, ex, idx, isLast){
+  const sp = ex.setPlan[idx];
+  sp.doneReps = sp.reps;
+  sp.doneWeight = sp.weight;
+  if (isLast){
+    const leveledTo = finishStrengthExercise(ex);
+    if (leveledTo != null){
+      showLevelUpToast(leveledTo, ()=> goToNextExerciseOrSummary());
+    } else {
+      goToNextExerciseOrSummary();
+    }
+    return;
+  }
+  startRest(ex.rest, ()=>{
+    ex.cursor = idx+1;
+    render();
+  });
+}
+
+function showLevelUpToast(newWeight, cb){
+  const holder = document.getElementById('rest-holder');
+  if (!holder){ cb(); return; }
+  holder.innerHTML = `<div class="rest-overlay">
+    <div style="font-size:36px;">📈</div>
+    <div class="rest-lbl">2 treinos seguidos no topo da faixa —<br>da próxima vez sobes para <b style="color:var(--good)">${newWeight} kg</b></div>
+  </div>`;
+  setTimeout(cb, 2200);
+}
+
+function startRest(seconds, onDone){
+  restRemaining = seconds;
+  const holder = document.getElementById('rest-holder');
+  if (!holder) return onDone();
+  holder.innerHTML = `<div class="rest-overlay"><div class="rest-lbl">Descanso</div><div class="rest-ring" id="rest-num">${restRemaining}</div><button class="btn ghost" id="rest-skip">Saltar descanso</button></div>`;
+  document.getElementById('rest-skip').onclick = ()=>{ clearInterval(restTimer); onDone(); };
+  restTimer = setInterval(()=>{
+    restRemaining--;
+    const numEl = document.getElementById('rest-num');
+    if (numEl) numEl.textContent = restRemaining;
+    if (restRemaining<=0){ clearInterval(restTimer); onDone(); }
+  },1000);
+}
+
+function renderCardioRunner(day, ex){
+  cardioRemaining = cardioRemaining || ex.minutes*60;
+  h(`
+    <div class="screen">
+      <div class="topbar">
+        <div class="iconbtn" id="btn-exit">←</div>
+        <div class="brand">${day.label}</div>
+        <div style="width:38px"></div>
+      </div>
+      <div class="runner">
+        <div class="runner-head">
+          <div class="runner-exname">${ex.name}</div>
+          <div class="runner-setlabel">${ex.note||''}</div>
+        </div>
+        <div class="stage">
+          <div class="cardio-timer" id="cardio-num">${fmtTime(cardioRemaining)}</div>
+          <div class="numlabel" style="margin-top:8px;">min : seg</div>
+        </div>
+        <div class="btnbar">
+          <button class="btn ghost" id="cardio-toggle">${cardioRunning?'Pausar':'Começar'}</button>
+          <button class="btn primary" id="cardio-done">Concluir</button>
+        </div>
+      </div>
+    </div>
+  `);
+  app.querySelector('#btn-exit').onclick = ()=>{ clearInterval(cardioTimer); cardioRunning=false; view='day'; render(); };
+  app.querySelector('#cardio-toggle').onclick = ()=>{
+    cardioRunning = !cardioRunning;
+    if (cardioRunning){
+      cardioTimer = setInterval(()=>{
+        cardioRemaining--;
+        const el = document.getElementById('cardio-num');
+        if (el) el.textContent = fmtTime(cardioRemaining);
+        if (cardioRemaining<=0){ clearInterval(cardioTimer); cardioRunning=false; }
+      },1000);
+    } else clearInterval(cardioTimer);
+    render();
+  };
+  app.querySelector('#cardio-done').onclick = ()=>{
+    clearInterval(cardioTimer); cardioRunning=false; cardioRemaining=0;
+    markExerciseDone(ex);
+    goToNextExerciseOrSummary();
+  };
+}
+function fmtTime(s){
+  s = Math.max(0,s);
+  const m = Math.floor(s/60), r = s%60;
+  return String(m).padStart(2,'0')+':'+String(r).padStart(2,'0');
+}
+
+function attachSwipe(el, {onLeft,onRight}){
+  if (!el) return;
+  let sx=null, sy=null, dragging=false;
+  el.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY; dragging=true; });
+  el.addEventListener('pointerup', e=>{
+    if (!dragging) return;
+    dragging=false;
+    const dx = e.clientX-sx, dy = e.clientY-sy;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)*1.5){
+      if (dx<0) onLeft(); else onRight();
+    }
+  });
+  el.addEventListener('pointercancel', ()=>dragging=false);
+}
+
+/* ====================== DAY SUMMARY ====================== */
+function renderDaySummary(){
+  const day = currentDay();
+  const totalSets = day.exercises.reduce((a,ex)=> a + (ex.type==='cardio'?1:ex.setPlan.length), 0);
+  h(`
+    <div class="screen center">
+      <div class="celebrate">
+        <div class="big">🔥</div>
+        <h1>Treino concluído</h1>
+        <p class="lead">${day.label} — bom trabalho.</p>
+        <div class="statgrid">
+          <div class="statbox"><b>${day.exercises.length}</b><span>exercícios</span></div>
+          <div class="statbox"><b>${totalSets}</b><span>séries</span></div>
+        </div>
+        <button class="btn primary full" id="back-dash">Voltar ao plano</button>
+      </div>
+    </div>
+  `);
+  app.querySelector('#back-dash').onclick = ()=>{
+    // reset cursors for next time
+    day.exercises.forEach(ex=>{ if(ex.setPlan) ex.cursor=0; });
+    view='dashboard'; render();
+  };
+}
+
+/* ====================== SETTINGS ====================== */
+const OBJ_LABELS = {emagrecer:'Emagrecer', massa:'Ganhar massa muscular', ambos:'Ambos (recomposição)'};
+const NIVEL_LABELS = {iniciante:'Iniciante', intermedio:'Intermédio', avancado:'Avançado'};
+
+function renderSettings(){
+  const p = DB.profile;
+  const focoLabel = p.foco.length ? p.foco.map(k => (FOCUS_OPTIONS.find(f=>f.k===k)||{}).l).filter(Boolean).join(', ') : 'Sem prioridade';
+
+  const row = (field, label, sub) => `<div class="settingsrow" data-field="${field}" style="cursor:pointer;">
+    <div><div class="srlabel">${label}</div><div class="srsub">${sub}</div></div>
+    <div class="chev">›</div>
+  </div>`;
+
+  h(`
+    <div class="screen">
+      <div class="topbar">
+        <div class="iconbtn" id="btn-back">←</div>
+        <div class="brand">Definições</div>
+        <div style="width:38px"></div>
+      </div>
+      ${row('altura_peso', 'Altura / Peso', `${p.altura} cm · ${p.peso} kg`)}
+      ${row('objetivo', 'Objetivo', OBJ_LABELS[p.objetivo])}
+      ${row('nivel', 'Nível', NIVEL_LABELS[p.nivel])}
+      ${row('dias', 'Dias por semana', `${p.dias}×`)}
+      ${row('foco', 'Prioridades', focoLabel)}
+      ${row('limitacoes', 'Limitações', p.limitacoes ? p.limitacoes : 'Nenhuma')}
+      <div class="btnbar" style="margin-top:20px;">
+        <button class="btn ghost full" id="btn-redo">Recomeçar do zero (questionário)</button>
+      </div>
+    </div>
+  `);
+
+  app.querySelector('#btn-back').onclick = ()=>{ view='dashboard'; render(); };
+  on('.settingsrow[data-field]','click', e=>{
+    settingsField = e.currentTarget.dataset.field;
+    settingsDraft = JSON.parse(JSON.stringify(DB.profile));
+    view = 'settingsField';
+    render();
+  });
+  app.querySelector('#btn-redo').onclick = ()=>{
+    if (confirm('Isto substitui o teu plano atual. Continuar?')){
+      DB.profile=null; DB.plan=null; DB.completion={};
+      persist();
+      settingsDraft = null; settingsField = null;
+      ob = {step:0, data:{altura:'', peso:'', objetivo:null, nivel:null, dias:null, foco:[], suplementos:null, limitacoes:''}};
+      view='onboarding'; render();
+    }
+  };
+}
+
+/* ====================== SETTINGS: DEDICATED FIELD SCREEN ====================== */
+function commitSettingsDraft(){
+  const d = settingsDraft;
+  const structural = d.objetivo!==DB.profile.objetivo || d.nivel!==DB.profile.nivel ||
+                      d.dias!==DB.profile.dias || JSON.stringify(d.foco)!==JSON.stringify(DB.profile.foco);
+  DB.profile = d;
+  if (structural){
+    DB.plan = generatePlan(DB.profile);
+    DB.completion = {};
+  }
+  persist();
+  settingsDraft = null; settingsField = null;
+  view = 'settings';
+  render();
+}
+
+function renderSettingsField(){
+  const d = settingsDraft;
+  const f = settingsField;
+  let title = '', body = '';
+
+  if (f === 'altura_peso'){
+    title = 'Altura e peso';
+    body = `
+      <div class="field" style="margin-top:8px;"><label>Altura (cm)</label><input type="number" inputmode="numeric" id="f-altura" value="${d.altura}"></div>
+      <div class="field"><label>Peso (kg)</label><input type="number" inputmode="decimal" id="f-peso" value="${d.peso}"></div>
+    `;
+  } else if (f === 'objetivo'){
+    title = 'Objetivo';
+    body = `
+      <p class="lead" style="margin-top:8px;">Isto define o equilíbrio entre musculação e cardio, e o esquema de séries.</p>
+      <div class="choices">
+        ${['emagrecer','massa','ambos'].map(v => `<div class="chip ${d.objetivo===v?'active':''}" data-v="${v}">${OBJ_LABELS[v]}</div>`).join('')}
+      </div>
+      <p class="disclaimer" style="margin-top:12px;">${objectiveSchemeNote(d.objetivo)}</p>
+    `;
+  } else if (f === 'nivel'){
+    title = 'Nível';
+    body = `
+      <p class="lead" style="margin-top:8px;">Ajusta o volume e a exigência de cada treino.</p>
+      <div class="choices">
+        ${['iniciante','intermedio','avancado'].map(v => `<div class="chip ${d.nivel===v?'active':''}" data-v="${v}">${NIVEL_LABELS[v]}</div>`).join('')}
+      </div>
+    `;
+  } else if (f === 'dias'){
+    title = 'Dias por semana';
+    body = `
+      <p class="lead" style="margin-top:8px;">Quantos dias por semana vais treinar?</p>
+      <div class="stepper-row">
+        <div class="stepper-btn" id="f-dias-menos">−</div>
+        <div class="stepper-val">${d.dias}</div>
+        <div class="stepper-btn" id="f-dias-mais">+</div>
+      </div>
+    `;
+  } else if (f === 'foco'){
+    title = 'Prioridades';
+    body = `
+      <p class="lead" style="margin-top:8px;">Zonas para dar ênfase extra (opcional).</p>
+      <div class="choices">
+        ${FOCUS_OPTIONS.map(fo => `<div class="chip ${d.foco.includes(fo.k)?'active':''}" data-foco="${fo.k}">${fo.l}</div>`).join('')}
+      </div>
+    `;
+  } else if (f === 'limitacoes'){
+    title = 'Limitações';
+    body = `
+      <p class="lead" style="margin-top:8px;">Lesões, dores ou restrições a ter em conta (opcional).</p>
+      <div class="field"><textarea id="f-limit" placeholder="ex: dor no joelho direito">${d.limitacoes||''}</textarea></div>
+    `;
+  }
+
+  h(`
+    <div class="screen">
+      <div class="topbar">
+        <div class="iconbtn" id="btn-back">←</div>
+        <div class="brand">${title}</div>
+        <div style="width:38px"></div>
+      </div>
+      ${body}
+      <div class="btnbar">
+        <button class="btn primary full" id="f-save">Guardar</button>
+      </div>
+    </div>
+  `);
+
+  app.querySelector('#btn-back').onclick = ()=>{ settingsDraft=null; settingsField=null; view='settings'; render(); };
+
+  if (f === 'altura_peso'){
+    app.querySelector('#f-altura').oninput = e => d.altura = e.target.value;
+    app.querySelector('#f-peso').oninput = e => d.peso = e.target.value;
+  }
+  if (f === 'objetivo' || f === 'nivel'){
+    on('.chip[data-v]','click', e=>{ d[f] = e.target.dataset.v; renderSettingsField(); });
+  }
+  if (f === 'dias'){
+    app.querySelector('#f-dias-menos').onclick = ()=>{ d.dias = Math.max(1, d.dias-1); renderSettingsField(); };
+    app.querySelector('#f-dias-mais').onclick = ()=>{ d.dias = Math.min(7, d.dias+1); renderSettingsField(); };
+  }
+  if (f === 'foco'){
+    on('.chip[data-foco]','click', e=>{
+      const k = e.target.dataset.foco;
+      const i = d.foco.indexOf(k);
+      if (i>-1) d.foco.splice(i,1); else d.foco.push(k);
+      renderSettingsField();
+    });
+  }
+  if (f === 'limitacoes'){
+    app.querySelector('#f-limit').oninput = e => d.limitacoes = e.target.value;
+  }
+
+  app.querySelector('#f-save').onclick = commitSettingsDraft;
+}
+
+/* ====================== SUPPLEMENTS ====================== */
+function renderSupplements(){
+  h(`
+    <div class="screen">
+      <div class="topbar">
+        <div class="iconbtn" id="btn-back">←</div>
+        <div class="brand">Suplementação</div>
+        <div style="width:38px"></div>
+      </div>
+      <p class="lead">Informação geral para combinar com o treino — não substitui uma avaliação médica ou nutricional.</p>
+
+      <div class="supp-card">
+        <span class="supp-tag">Prioridade</span>
+        <h3>Creatina monohidratada</h3>
+        <p>5 g por dia, todos os dias, mesmo fora do treino. Não precisas de fase de carga nem de ciclos. Escolhe simplesmente creatina monohidratada — não precisas de fórmulas "premium".</p>
+      </div>
+      <div class="supp-card">
+        <h3>Proteína (whey opcional)</h3>
+        <p>Procura cerca de 1.6–2.2 g de proteína por kg de peso corporal por dia. A whey é apenas uma forma prática de atingir esse total — só faz sentido se a comida não for suficiente.</p>
+      </div>
+      <div class="supp-card">
+        <h3>Cafeína (opcional)</h3>
+        <p>100–200 mg cerca de 30–60 min antes do treino pode ajudar na energia e concentração. Começa por doses mais baixas e evita perto da hora de dormir.</p>
+      </div>
+      <div class="supp-card">
+        <h3>Ómega 3 e vitamina D</h3>
+        <p>Fazem sentido sobretudo se comes pouco peixe gordo ou tens exposição solar reduzida. Não são essenciais para hipertrofia por si só.</p>
+      </div>
+      <div class="supp-card">
+        <h3>O que normalmente não é necessário</h3>
+        <p>BCAA, queimadores de gordura, "test boosters" e pré-treinos com fórmulas proprietárias raramente compensam o custo face à dieta, treino, sono e creatina.</p>
+      </div>
+      <p class="disclaimer">Esta secção é informação geral, não uma recomendação médica personalizada. Consulta um profissional de saúde antes de iniciar qualquer suplemento, especialmente se tiveres condições de saúde ou tomares medicação.</p>
+    </div>
+  `);
+  app.querySelector('#btn-back').onclick = ()=>{ view = supplementsFrom; render(); };
+}
+
+/* ====================== ROUTER ====================== */
+function render(){
+  if (sessionDate !== new Date().toDateString()){
+    sessionDate = new Date().toDateString();
+  }
+  if (view==='onboarding') return renderOnboarding();
+  if (view==='dashboard') return renderDashboard();
+  if (view==='day') return renderDay();
+  if (view==='runner') return renderRunner();
+  if (view==='daySummary') return renderDaySummary();
+  if (view==='settings') return renderSettings();
+  if (view==='settingsField') return renderSettingsField();
+  if (view==='supplements') return renderSupplements();
+}
+render();
+
+/* ====================== SERVICE WORKER ====================== */
+if ('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
